@@ -1,22 +1,24 @@
 BASE: ['']
 TOOLBOX_MODE: "train_and_test"      # "train_and_test"  or "only_test"
 TRAIN:
-  BATCH_SIZE: 4
+  BATCH_SIZE: 16
   EPOCHS: 10
   LR: 1e-3
   MODEL_FILE_NAME: SCAMPS_SCAMPS_PURE_tscan
   DATA:
     FS: 30
-    DATASET: SCAMPS
-    DO_PREPROCESS: False               # if first time, should be true
+    DATASET: MASCAMPS_700_MOD_INT
+    DO_PREPROCESS: True               # if first time, should be true
     DATA_FORMAT: NDCHW
-    DATA_PATH: "/gscratch/ubicomp/xliu0/data3/mnt/Datasets/SyntheticsPublicDataset/RawData/Train"          # Raw dataset path, need to be updated
-    CACHED_PATH: "/gscratch/ubicomp/xliu0/data3/mnt/Datasets/rppg_toolbox/PreprocessedData"    # Processed dataset save path, need to be updated
+    # /playpen-temp/users/akshay/datasets/MASCAMPS_2800_TH_V1
+    # /playpen-temp/users/akshay/datasets/scamps_videos
+    DATA_PATH: "/playpen-temp/users/akshay/datasets/MASCAMPS_700_MOD_INT/train"          # Raw dataset path, need to be updated
+    CACHED_PATH: "/playpen-temp/users/akshay/datasets/preprocessed"    # Processed dataset save path, need to be updated
     EXP_DATA_NAME: ""
     BEGIN: 0.0
     END: 1.0
     PREPROCESS :
-      DATA_TYPE: ['Normalized','Standardized']
+      DATA_TYPE: [ 'Normalized','Standardized' ]
       LABEL_TYPE: Normalized
       DO_CHUNK: True
       CHUNK_LENGTH: 180
@@ -30,11 +32,11 @@ TRAIN:
 VALID:
   DATA:
     FS: 30
-    DATASET: SCAMPS
-    DO_PREPROCESS: False                  # if first time, should be true
+    DATASET: MASCAMPS_700_MOD_INT
+    DO_PREPROCESS: True                 # if first time, should be true
     DATA_FORMAT: NDCHW
-    DATA_PATH: "/gscratch/ubicomp/xliu0/data3/mnt/Datasets/SyntheticsPublicDataset/RawData/Val"          # Raw dataset path, need to be updated
-    CACHED_PATH: "/gscratch/ubicomp/xliu0/data3/mnt/Datasets/rppg_toolbox/PreprocessedData"    # Processed dataset save path, need to be updated
+    DATA_PATH: "/playpen-temp/users/akshay/datasets/MASCAMPS_700_MOD_INT/val"          # Raw dataset path, need to be updated
+    CACHED_PATH: "/playpen-temp/users/akshay/datasets/preprocessed"    # Processed dataset save path, need to be updated
     EXP_DATA_NAME: ""
     BEGIN: 0.0
     END: 1.0
@@ -57,8 +59,8 @@ TEST:
     DATASET: PURE
     DO_PREPROCESS: False                    # if first time, should be true
     DATA_FORMAT: NDCHW
-    DATA_PATH: "/gscratch/ubicomp/xliu0/data3/mnt/Datasets/PURE/RawData"                     # Raw dataset path, need to be updated
-    CACHED_PATH: "/gscratch/ubicomp/xliu0/data3/mnt/Datasets/rppg_toolbox/PreprocessedData"    # Processed dataset save path, need to be updated
+    DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/PURE/RawData"                     # Raw dataset path, need to be updated
+    CACHED_PATH: "/playpen-temp/users/akshay/datasets/preprocessed"    # Processed dataset save path, need to be updated
     EXP_DATA_NAME: ""
     BEGIN: 0.0
     END: 1.0
@@ -75,7 +77,7 @@ TEST:
       H: 72
       W: 72
 DEVICE: cuda:0
-NUM_OF_GPU_TRAIN: 4
+NUM_OF_GPU_TRAIN: 1
 LOG:
   PATH: runs/exp
 MODEL:

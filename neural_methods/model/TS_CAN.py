@@ -6,6 +6,8 @@ Xin Liu, Josh Fromm, Shwetak Patel, Daniel McDuff
 
 import torch
 import torch.nn as nn
+import numpy as np
+import uuid
 
 
 class Attention_mask(nn.Module):
@@ -129,6 +131,11 @@ class TSCAN(nn.Module):
 
         g1 = torch.sigmoid(self.apperance_att_conv1(r2))
         g1 = self.attn_mask_1(g1)
+        # r_uuid4 = str(uuid.uuid4())
+        # filename = 'attn_mask_1' + '_' + r_uuid4 + '.npy'
+        # g1_cpu = g1.cpu()
+        # g1_cpu = g1_cpu.detach().numpy()
+        # np.save(filename, np.array(g1_cpu))
         gated1 = d2 * g1
 
         d3 = self.avg_pooling_1(gated1)
@@ -147,6 +154,10 @@ class TSCAN(nn.Module):
 
         g2 = torch.sigmoid(self.apperance_att_conv2(r6))
         g2 = self.attn_mask_2(g2)
+        # filename = 'attn_mask_2' + '_' + r_uuid4 + '.npy'
+        # g2_cpu = g2.cpu()
+        # g2_cpu = g2_cpu.detach().numpy()
+        # np.save(filename, np.array(g2_cpu))
         gated2 = d6 * g2
 
         d7 = self.avg_pooling_3(gated2)

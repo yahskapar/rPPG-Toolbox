@@ -125,10 +125,44 @@ if __name__ == "__main__":
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
         elif config.TRAIN.DATA.DATASET == "UBFC":
             train_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TRAIN.DATA.DATASET == "PURE":
             train_loader = data_loader.PURELoader.PURELoader
         elif config.TRAIN.DATA.DATASET == "SCAMPS":
             train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "MASCAMPS_2800_MOD_INT":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "MASCAMPS_700_MOD_INT":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "MASCAMPS_1400_MOD_INT":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "MASCAMPS_4200_MOD_INT":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "MASCAMPS_2800_TH_V1":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "SCAMPS400":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "SCAMPS600":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "MASCAMPS400":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "MASCAMPS200Mod":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "MASCAMPS200Int":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "MASCAMPS600Combo":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "SCAMPS700":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "SCAMPS1400":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "SCAMPS2100":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "MASCAMPS700":
+            train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "UBFCPHYS":
+            train_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
 
@@ -138,10 +172,44 @@ if __name__ == "__main__":
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
         elif config.VALID.DATA.DATASET == "UBFC":
             valid_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.VALID.DATA.DATASET == "MAUBFC":
+            valid_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.VALID.DATA.DATASET == "PURE":
             valid_loader = data_loader.PURELoader.PURELoader
         elif config.VALID.DATA.DATASET == "SCAMPS":
             valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "MASCAMPS_2800_MOD_INT":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "MASCAMPS_700_MOD_INT":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "MASCAMPS_1400_MOD_INT":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "MASCAMPS_4200_MOD_INT":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "MASCAMPS_2800_TH_V1":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "SCAMPS400":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "SCAMPS600":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "MASCAMPS400":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "MASCAMPS200Mod":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "MASCAMPS200Int":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "MASCAMPS600Combo":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "SCAMPS700":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "SCAMPS1400":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "SCAMPS2100":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "MASCAMPS700":
+            valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "UBFCPHYS":
+            valid_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
 
@@ -151,10 +219,44 @@ if __name__ == "__main__":
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
         elif config.TEST.DATA.DATASET == "UBFC":
             test_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.TEST.DATA.DATASET == "MAUBFC":
+            test_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TEST.DATA.DATASET == "PURE":
             test_loader = data_loader.PURELoader.PURELoader
         elif config.TEST.DATA.DATASET == "SCAMPS":
             test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "MASCAMPS_2800_MOD_INT":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "MASCAMPS_700_MOD_INT":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "MASCAMPS_1400_MOD_INT":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "MASCAMPS_4200_MOD_INT":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "MASCAMPS_2800_TH_V1":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "SCAMPS400":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "SCAMPS600":   
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "MASCAMPS400":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "MASCAMPS200Mod":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "MASCAMPS200Int":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "MASCAMPS600Combo":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "SCAMPS700":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "SCAMPS1400":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "SCAMPS2100":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "MASCAMPS700":
+            test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
 

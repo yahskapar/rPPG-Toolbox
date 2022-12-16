@@ -14,6 +14,9 @@ from neural_methods.model.DeepPhys import DeepPhys
 from neural_methods.model.PhysNet import PhysNet_padding_Encoder_Decoder_MAX
 from neural_methods.model.TS_CAN import TSCAN
 from torch.utils.data import DataLoader
+import statsmodels.api as sm
+import matplotlib as plt
+import uuid
 
 
 def read_label(dataset):
@@ -49,9 +52,13 @@ def calculate_metrics(predictions, labels, config):
     gt_hr_fft_all = list()
     predict_hr_peak_all = list()
     gt_hr_peak_all = list()
+    raw_labels = list()
+    raw_preds = list()
     for index in predictions.keys():
         prediction = reform_data_from_dict(predictions[index])
         label = reform_data_from_dict(labels[index])
+        raw_labels.append([label])
+        raw_preds.append([prediction])
 
         if config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "Standardized" or \
                 config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "Raw":
@@ -68,6 +75,11 @@ def calculate_metrics(predictions, labels, config):
         predict_hr_fft_all.append(pred_hr_fft)
         predict_hr_peak_all.append(pred_hr_peak)
         gt_hr_peak_all.append(gt_hr_peak)
+
+    # Save the predictions and labels
+    np.save('predictions_ubfc_phys.npy', np.array(raw_preds))
+    np.save('labels_ubfc_phys.npy', np.array(raw_labels))
+
     predict_hr_peak_all = np.array(predict_hr_peak_all)
     predict_hr_fft_all = np.array(predict_hr_fft_all)
     gt_hr_peak_all = np.array(gt_hr_peak_all)
@@ -115,3 +127,8 @@ def calculate_metrics(predictions, labels, config):
 
         else:
             raise ValueError("Wrong Test Metric Type")
+            
+    # Save a Bland-Altman Plot of Test Results
+    sm.graphics.mean_diff_plot(gt_hr_fft_all, predict_hr_fft_all)
+    plt.pyplot.savefig('bland_altman_plot.png')
+

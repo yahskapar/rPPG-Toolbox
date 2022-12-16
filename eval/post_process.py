@@ -7,7 +7,9 @@ import scipy
 import scipy.io
 from scipy.signal import butter
 from scipy.sparse import spdiags
-
+import time
+import os
+import uuid
 
 # %% Helper Function
 def next_power_of_2(x):
@@ -123,6 +125,12 @@ def calculate_metric_peak_per_video(predictions, labels, diff_flag=True, signal=
 
 
 def calculate_metric_per_video(predictions, labels, diff_flag=True, signal='pulse', fs=30, bpFlag=True):
+    # r_uuid4 = str(uuid.uuid4())
+    # preds_filename = 'preds' + '_' + r_uuid4 + '.npy'
+    # labels_filename = 'labels' + '_' + r_uuid4 + '.npy'
+    # np.save(preds_filename, np.array(predictions))
+    # np.save(labels_filename, np.array(labels))
+
     if signal == 'pulse':
         [b, a] = butter(1, [0.75 / fs * 2, 2.5 / fs * 2],
                         btype='bandpass')  # 2.5 -> 1.7
@@ -152,6 +160,7 @@ def calculate_metric_per_video(predictions, labels, diff_flag=True, signal='puls
     N = next_power_of_2(pred_window.shape[1])
     f_prd, pxx_pred = scipy.signal.periodogram(
         pred_window, fs=fs, nfft=N, detrend=False)
+
     if signal == 'pulse':
         # regular Heart beat are 0.75*60 and 2.5*60
         fmask_pred = np.argwhere((f_prd >= 0.75) & (f_prd <= 2.5))
@@ -162,6 +171,7 @@ def calculate_metric_per_video(predictions, labels, diff_flag=True, signal='puls
     # Labels FFT
     f_label, pxx_label = scipy.signal.periodogram(
         label_window, fs=fs, nfft=N, detrend=False)
+    
     if signal == 'pulse':
         # regular Heart beat are 0.75*60 and 2.5*60
         fmask_label = np.argwhere((f_label >= 0.75) & (f_label <= 2.5))

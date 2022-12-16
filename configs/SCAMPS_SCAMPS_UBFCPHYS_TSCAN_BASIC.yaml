@@ -1,22 +1,22 @@
 BASE: ['']
-TOOLBOX_MODE: "train_and_test"      # "train_and_test"  or "only_test"
+TOOLBOX_MODE: "only_test"      # "train_and_test"  or "only_test"
 TRAIN:
   BATCH_SIZE: 16
   EPOCHS: 10
   LR: 1e-3
-  MODEL_FILE_NAME: UBFC_UBFC_PURE_tscan
+  MODEL_FILE_NAME: SCAMPS_SCAMPS_UBFCPHYS_tscan
   DATA:
     FS: 30
-    DATASET: UBFC
+    DATASET: SCAMPS
     DO_PREPROCESS: False               # if first time, should be true
     DATA_FORMAT: NDCHW
-    DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/UBFC-rPPG/DATASET_2_backup/DATASET_2"                     # Raw dataset path, need to be updated
-    CACHED_PATH: "/playpen-temp/users/akshay/datasets/preprocessed"    # Processed dataset save path, need to be updated
+    DATA_PATH: "/playpen-temp/users/akshay/datasets/SCAMPS_2800/train"    # Raw dataset path, need to be updated
+    CACHED_PATH: "/playpen-temp/users/akshay/datasets/preprocessed"  # Processed dataset save path, need to be updated
     EXP_DATA_NAME: ""
     BEGIN: 0.0
     END: 0.8
     PREPROCESS :
-      DATA_TYPE: ['Normalized','Standardized']
+      DATA_TYPE: ['Raw']
       LABEL_TYPE: Normalized
       DO_CHUNK: True
       CHUNK_LENGTH: 180
@@ -30,10 +30,10 @@ TRAIN:
 VALID:
   DATA:
     FS: 30
-    DATASET: UBFC
+    DATASET: SCAMPS
     DO_PREPROCESS: False                  # if first time, should be true
     DATA_FORMAT: NDCHW
-    DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/UBFC-rPPG/DATASET_2_backup/DATASET_2"                     # Raw dataset path, need to be updated
+    DATA_PATH: "/playpen-temp/users/akshay/datasets/SCAMPS_2800/val"          # Raw dataset path, need to be updated
     CACHED_PATH: "/playpen-temp/users/akshay/datasets/preprocessed"    # Processed dataset save path, need to be updated
     EXP_DATA_NAME: ""
     BEGIN: 0.8
@@ -53,11 +53,11 @@ VALID:
 TEST:
   METRICS: ['MAE','RMSE','MAPE','Pearson']
   DATA:
-    FS: 30
-    DATASET: PURE
-    DO_PREPROCESS: False                    # if first time, should be true
+    FS: 35
+    DATASET: UBFCPHYS
+    DO_PREPROCESS: True                    # if first time, should be true
     DATA_FORMAT: NDCHW
-    DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/PURE/RawData"                     # Raw dataset path, need to be updated
+    DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/UBFC-PHYS"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/playpen-temp/users/akshay/datasets/preprocessed"    # Processed dataset save path, need to be updated
     EXP_DATA_NAME: ""
     BEGIN: 0.0
@@ -86,5 +86,5 @@ MODEL:
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: FFT        # "FFT" or "peak detection"
-  MODEL_PATH:   ""
-                   
+  MODEL_PATH:   "/playpen-temp/users/akshay/models/SCAMPS_SCAMPS_PURE_tscan_th_v1_ma.pth"
+                  
