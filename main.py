@@ -136,6 +136,8 @@ if __name__ == "__main__":
             train_loader = data_loader.PURELoader.PURELoader
         elif config.TRAIN.DATA.DATASET == "SCAMPS":
             train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TRAIN.DATA.DATASET == "UBFCPHYS":
+            train_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
 
@@ -167,6 +169,8 @@ if __name__ == "__main__":
             test_loader = data_loader.PURELoader.PURELoader
         elif config.TEST.DATA.DATASET == "SCAMPS":
             test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
 
@@ -229,6 +233,8 @@ if __name__ == "__main__":
             signal_loader = data_loader.PURELoader.PURELoader
         elif config.SIGNAL.DATA.DATASET == "SCAMPS":
             signal_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.SIGNAL.DATA.DATASET == "UBFCPHYS":
+            signal_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
 
