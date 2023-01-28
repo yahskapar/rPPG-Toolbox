@@ -12,6 +12,9 @@ from neural_methods.loss.NegPearsonLoss import Neg_Pearson
 from neural_methods.model.TS_CAN import TSCAN
 from neural_methods.trainer.BaseTrainer import BaseTrainer
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+import colormap as cmaps
+import matplotlib.cm as cm
 
 
 class TscanTrainer(BaseTrainer):
@@ -55,6 +58,10 @@ class TscanTrainer(BaseTrainer):
             self.model.train()
             # Model Training
             tbar = tqdm(data_loader["train"], ncols=80)
+
+            # fig = plt.figure()
+            # ax = fig.add_subplot(111)
+
             for idx, batch in enumerate(tbar):
                 tbar.set_description("Train epoch %s" % epoch)
                 data, labels = batch[0].to(
@@ -77,6 +84,17 @@ class TscanTrainer(BaseTrainer):
                     running_loss = 0.0
                 train_loss.append(loss.item())
                 tbar.set_postfix(loss=loss.item())
+
+            # pca_result = np.load('pca_result.npy')
+            # plt.scatter(pca_result[:,0], pca_result[:,1])
+            # if os.path.exists("pca_result.npy"):
+            #     os.remove("pca_result.npy")
+            # else:
+            #     print("The file does not exist")
+            # ax.legend()
+            # plt.savefig("Test_pca_result.png")
+            # exit()
+
             self.save_model(epoch)
             if not self.config.TEST.USE_LAST_EPOCH: 
                 valid_loss = self.valid(data_loader)
@@ -91,6 +109,16 @@ class TscanTrainer(BaseTrainer):
                     print("Update best model! Best epoch: {}".format(self.best_epoch))
         if not self.config.TEST.USE_LAST_EPOCH: 
             print("best trained epoch: {}, min_val_loss: {}".format(self.best_epoch, self.min_valid_loss))
+        # pca_result = np.load('pca_result.npy')
+        # fig = plt.figure()
+        # ax = fig.add_subplot(111)
+        # ax.legend()
+        # plt.scatter(pca_result[:,0], pca_result[:,1])
+        # plt.savefig("Test_pca_result_3.png")
+        # exit()
+        # ax.legend()
+        # plt.savefig("Test_pca_result_3_epochs.png")
+        # exit()
 
     def valid(self, data_loader):
         """ Model evaluation on the validation dataset."""

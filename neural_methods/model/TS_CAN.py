@@ -6,6 +6,11 @@ Xin Liu, Josh Fromm, Shwetak Patel, Daniel McDuff
 
 import torch
 import torch.nn as nn
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
+from pathlib import Path
 
 
 class Attention_mask(nn.Module):
@@ -153,6 +158,41 @@ class TSCAN(nn.Module):
         d8 = self.dropout_3(d7)
         d9 = d8.view(d8.size(0), -1)
         d10 = torch.tanh(self.final_dense_1(d9))
+
+        # # Visualize final_dense_1 output [720, 128]
+        # # 720 corresponds to total frames in a batch (180 * 4)
+        # # 128 corresponds to the # of features
+        # features = d10.cpu().detach().numpy()
+
+        # # tsne_result = TSNE(n_components=2).fit_transform(features)
+        # # print(tsne_result.shape)
+
+        # pca = PCA(n_components=2)
+        # pca.fit(features)
+        # pca_result = pca.transform(features)
+        # print(pca_result.shape)
+
+        # path = Path('./pca_result.npy')
+
+        # if path.is_file():
+        #     # npy_file_result = np.load('pca_result.npy')
+        #     # print(npy_file_result.size)
+        #     # npy_file_result = np.concatenate((npy_file_result, pca_result), axis=0)
+        #     # print(npy_file_result.size)
+        #     # np.save('pca_result.npy', npy_file_result)
+
+        #     npy_file_result = np.load('pca_result.npy')
+        #     npy_new_file_result = np.concatenate((npy_file_result, pca_result), axis=0)
+        #     np.save('pca_result.npy', npy_new_file_result) # TEMP
+        # else:
+        #     np.save('pca_result.npy', pca_result)
+
+        # fig = plt.figure()
+        # ax = fig.add_subplot(111)
+        # ax.legend()
+        # plt.scatter(tsne_result[:,0], tsne_result[:,1])
+        # plt.savefig("Test_tsne_result.png")
+
         d11 = self.dropout_4(d10)
         out = self.final_dense_2(d11)
 
