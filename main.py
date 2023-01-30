@@ -132,11 +132,19 @@ if __name__ == "__main__":
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
         elif config.TRAIN.DATA.DATASET == "UBFC":
             train_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC_A_B":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TRAIN.DATA.DATASET == "PURE":
             train_loader = data_loader.PURELoader.PURELoader
+        elif config.TRAIN.DATA.DATASET == "MAPURE":
+            train_loader = data_loader.MAPURELoader.MAPURELoader
         elif config.TRAIN.DATA.DATASET == "SCAMPS":
             train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
-        elif config.TRAIN.DATA.DATASET == "UBFCPHYS":
+        elif config.TRAIN.DATA.DATASET == "UBFCPHYS_T2_TestA":
+            train_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TRAIN.DATA.DATASET == "UBFCPHYS_T2_TestB":
             train_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
@@ -147,10 +155,20 @@ if __name__ == "__main__":
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
         elif config.VALID.DATA.DATASET == "UBFC":
             valid_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.VALID.DATA.DATASET == "MAUBFC":
+            valid_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.VALID.DATA.DATASET == "MAUBFC_A_B":
+            valid_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.VALID.DATA.DATASET == "PURE":
             valid_loader = data_loader.PURELoader.PURELoader
+        elif config.VALID.DATA.DATASET == "MAPURE":
+            valid_loader = data_loader.MAPURELoader.MAPURELoader
         elif config.VALID.DATA.DATASET == "SCAMPS":
             valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.VALID.DATA.DATASET == "UBFCPHYS_T2_TestA":
+            valid_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.VALID.DATA.DATASET == "UBFCPHYS_T2_TestB":
+            valid_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
         elif config.VALID.DATA.DATASET is None and not config.TEST.USE_LAST_EPOCH:
                 raise ValueError("Validation dataset not specified despite USE_LAST_EPOCH set to False!")
         else:
@@ -170,6 +188,32 @@ if __name__ == "__main__":
         elif config.TEST.DATA.DATASET == "SCAMPS":
             test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
         elif config.TEST.DATA.DATASET == "UBFCPHYS":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T1_TestA":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T1_TestB":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T2_TestA":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T2_TestB":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T3_TestA":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T3_TestB":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T2_FaceCroppingTest":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T2_FaceCropping_Original":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T2_FaceCropping_Median":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T1_FaceCropping_Median_1-1_HC":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T2_FaceCropping_Median_1-1_HC":      # Actually 1.1 coefficient
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T3_FaceCropping_Median_1-1_HC":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T2_FaceCropping_Off":
             test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
@@ -227,6 +271,26 @@ if __name__ == "__main__":
         if config.SIGNAL.DATA.DATASET == "COHFACE":
             # signal_loader = data_loader.COHFACELoader.COHFACELoader
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
+        elif config.SIGNAL.DATA.DATASET == "UBFC":
+            signal_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.SIGNAL.DATA.DATASET == "UBFCPHYS_T1_TestA":
+            signal_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.SIGNAL.DATA.DATASET == "UBFCPHYS_T1_TestB":
+            signal_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.SIGNAL.DATA.DATASET == "UBFCPHYS_T2_TestA":
+            signal_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.SIGNAL.DATA.DATASET == "UBFCPHYS_T1_FaceCropping_Median_1-1_HC":
+            signal_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.SIGNAL.DATA.DATASET == "UBFCPHYS_T2_FaceCropping_Median_1-1_HC":
+            signal_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.SIGNAL.DATA.DATASET == "UBFCPHYS_T3_FaceCropping_Median_1-1_HC":
+            signal_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.SIGNAL.DATA.DATASET == "UBFCPHYS_T2_TestB":
+            signal_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.SIGNAL.DATA.DATASET == "UBFCPHYS_T3_TestA":
+            signal_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.SIGNAL.DATA.DATASET == "UBFCPHYS_T3_TestB":
+            signal_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
         elif config.SIGNAL.DATA.DATASET == "UBFC":
             signal_loader = data_loader.UBFCLoader.UBFCLoader
         elif config.SIGNAL.DATA.DATASET == "PURE":

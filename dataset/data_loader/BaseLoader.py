@@ -209,11 +209,12 @@ class BaseLoader(Dataset):
         else:
             face_box_coor = face_zone[0]
         if use_larger_box:
-            face_box_coor[0] = max(0, face_box_coor[0] - (larger_box_coef - 1.0) / 2 * face_box_coor[2])
-            face_box_coor[1] = max(0, face_box_coor[1] - (larger_box_coef - 1.0) / 2 * face_box_coor[3])
-            face_box_coor[2] = larger_box_coef * face_box_coor[2]
-            face_box_coor[3] = larger_box_coef * face_box_coor[3]
-        return face_box_coor
+            face_box_new_coord = [0, 0, 0, 0]
+            face_box_new_coord[0] = max(0, face_box_coor[0] - (larger_box_coef - 1.0) / 2 * face_box_coor[2])
+            face_box_new_coord[1] = max(0, face_box_coor[1] - (larger_box_coef - 1.0) / 2 * face_box_coor[3])
+            face_box_new_coord[2] = larger_box_coef * face_box_coor[2]
+            face_box_new_coord[3] = larger_box_coef * face_box_coor[3]
+        return face_box_new_coord
 
     def face_crop_resize(self, frames, use_dynamic_detection, detection_freq, width, height,
                          use_larger_box, use_face_detection, larger_box_coef):
@@ -242,11 +243,19 @@ class BaseLoader(Dataset):
         face_region_all = []
         # Perform face detection by num_dynamic_det" times.
         for idx in range(num_dynamic_det):
+            # if idx > 3:
+            #     break
             if use_face_detection:
-                face_region_all.append(self.face_detection(frames[detection_freq * idx], use_larger_box, larger_box_coef))
+                face_detection_result = self.face_detection(frames[detection_freq * idx], use_larger_box, larger_box_coef)
+                # print(face_detection_result)
+                face_region_all.append(face_detection_result)
+            # elif use_face_detection_median:
+            #     face_region_all.append(self.face_detection(frames[1 * idx], use_larger_box, larger_box_coef))
             else:
                 face_region_all.append([0, 0, frames.shape[1], frames.shape[2]])
         face_region_all = np.asarray(face_region_all, dtype='int')
+        face_region_median = np.median(face_region_all, axis=0).astype('int')
+        # print(face_region_median)
 
         # Frame Resizing
         resized_frames = np.zeros((frames.shape[0], height, width, 3))
@@ -257,7 +266,9 @@ class BaseLoader(Dataset):
             else:  # use the first region obtrained from the first frame.
                 reference_index = 0
             if use_face_detection:
-                face_region = face_region_all[reference_index]
+                # CHANGE ME
+                # face_region = face_region_all[reference_index]
+                face_region = face_region_median
                 frame = frame[max(face_region[1], 0):min(face_region[1] + face_region[3], frame.shape[0]),
                         max(face_region[0], 0):min(face_region[0] + face_region[2], frame.shape[1])]
             resized_frames[i] = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)

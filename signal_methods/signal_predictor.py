@@ -14,6 +14,8 @@ from signal_methods.methods.LGI import *
 from signal_methods.methods.PBV import *
 from signal_methods.methods.POS_WANG import *
 from tqdm import tqdm
+import statsmodels.api as sm
+import matplotlib as plt
 
 
 def signal_predict(config, data_loader, method_name):
@@ -26,7 +28,21 @@ def signal_predict(config, data_loader, method_name):
     predict_hr_fft_all = []
     gt_hr_fft_all = []
     sbar = tqdm(data_loader["signal"], ncols=80)
+
+    # T1
+    # subselect_out = ["s3", "s8", "s9", "s26", "s28", "s30", "s31", "s32", "s33", "s40", "s52", "s53", "s54", "s56"]
+    # T2
+    # subselect_out = ["s1", "s4", "s6", "s8", "s9", "s11", "s12", "s13", "s14", "s19", "s21", "s22", "s25", "s26", "s27", "s28", "s31", "s32", "s33", "s35", "s38", "s39", "s41", "s42", "s45", "s47", "s48", "s52", "s53", "s55"]
+    # T3
+    subselect_out = ["s5", "s8", "s9", "s10", "s13", "s14", "s17", "s22", "s25", "s26", "s28", "s30", "s32", "s33", "s35", "s37", "s40", "s47", "s48", "s49", "s50", "s52", "s53"]
+    print("{} subjects will be ignored!".format(len(subselect_out)))
+
     for _, test_batch in enumerate(sbar):
+        # print(test_batch[2][0])
+        if test_batch[2][0] in subselect_out:
+            print("Skipping subject!")
+            continue
+
         batch_size = test_batch[0].shape[0]
         for idx in range(batch_size):
             data_input, labels_input = test_batch[0][idx].cpu().numpy(), test_batch[1][idx].cpu().numpy()
@@ -96,3 +112,6 @@ def signal_predict(config, data_loader, method_name):
                 print("FFT Pearson  (FFT Label):{0}".format(Pearson_PEAK[0][1]))
             else:
                 raise ValueError("Wrong Test Metric Type")
+    # Save a Bland-Altman Plot of Test Results
+    sm.graphics.mean_diff_plot(gt_hr_fft_all, predict_hr_fft_all)
+    plt.pyplot.savefig('bland_altman_plot_T3_MFC_SS_SIGNAL.png')

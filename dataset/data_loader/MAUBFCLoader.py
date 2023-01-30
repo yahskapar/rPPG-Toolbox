@@ -1,6 +1,4 @@
-"""The dataloader for UBFC-PHYS datasets.
-
-TODO: Update this
+"""The dataloader for MAUBFC datasets.
 
 Details for the UBFC-RPPG Dataset see https://sites.google.com/view/ybenezeth/ubfcrppg.
 If you use this dataset, please cite this paper:
@@ -15,10 +13,10 @@ import cv2
 import numpy as np
 from dataset.data_loader.BaseLoader import BaseLoader
 from tqdm import tqdm
-import csv
 
-class UBFCPHYSLoader(BaseLoader):
-    """The data loader for the UBFC dataset."""
+
+class MAUBFCLoader(BaseLoader):
+    """The data loader for the MAUBFC dataset."""
 
     def __init__(self, name, data_path, config_data):
         """Initializes an UBFC dataloader.
@@ -45,16 +43,16 @@ class UBFCPHYSLoader(BaseLoader):
 
     def get_raw_data(self, data_path):
         """Returns data directories under the path(For UBFC dataset)."""
-        data_dirs = glob.glob(data_path + os.sep + "s*")
+        data_dirs = glob.glob(data_path + os.sep + "subject*")
         if not data_dirs:
-            raise ValueError(self.dataset_name + " data paths empty!")
+            raise ValueError(self.name + " dataset get data error!")
         dirs = [{"index": re.search(
-            's(\d+)', data_dir).group(0), "path": data_dir} for data_dir in data_dirs]
+            'subject(\d+)', data_dir).group(0), "path": data_dir} for data_dir in data_dirs]
         return dirs
 
     def split_raw_data(self, data_dirs, begin, end):
-        """Returns a subset of data dirs, split with begin and end values."""
-        if begin == 0 and end == 1:  # return the full directory if begin == 0 and end == 1
+        """Returns a subset of data dirs, split with begin and end values"""
+        if begin == 0 and end == 1: # return the full directory if begin == 0 and end == 1
             return data_dirs
 
         file_num = len(data_dirs)
@@ -71,25 +69,12 @@ class UBFCPHYSLoader(BaseLoader):
         filename = os.path.split(data_dirs[i]['path'])[-1]
         saved_filename = data_dirs[i]['index']
 
+        # print(glob.glob(os.path.join(data_dirs[i]['path'],'*.npy')))
+
         frames = self.read_video(
-            os.path.join(data_dirs[i]['path'],"vid_{0}_T2.avi".format(filename)))
+            glob.glob(os.path.join(data_dirs[i]['path'],'*.npy')))
         bvps = self.read_wave(
-            os.path.join(data_dirs[i]['path'],"bvp_{0}_T2.csv".format(filename)))
-
-        # np.append(frames, self.read_video(
-        #     os.path.join(data_dirs[i]['path'],"vid_{0}_T2.avi".format(filename))))
-        # np.append(bvps, self.read_wave(
-        #     os.path.join(data_dirs[i]['path'],"bvp_{0}_T2.csv".format(filename))))
-
-        # np.append(frames, self.read_video(
-        #     os.path.join(data_dirs[i]['path'],"vid_{0}_T3.avi".format(filename))))
-        # np.append(bvps, self.read_wave(
-        #     os.path.join(data_dirs[i]['path'],"bvp_{0}_T3.csv".format(filename))))
-
-        # print(np.size(frames))
-        # print(np.size(bvps))
-
-        bvps = BaseLoader.resample_ppg(bvps, frames.shape[0])
+            os.path.join(data_dirs[i]['path'],"ground_truth.txt"))
             
         frames_clips, bvps_clips = self.preprocess(frames, bvps, config_preprocess)
         input_name_list, label_name_list = self.save_multi_process(frames_clips, bvps_clips, saved_filename)
@@ -98,23 +83,15 @@ class UBFCPHYSLoader(BaseLoader):
     @staticmethod
     def read_video(video_file):
         """Reads a video file, returns frames(T,H,W,3) """
-        VidObj = cv2.VideoCapture(video_file)
-        VidObj.set(cv2.CAP_PROP_POS_MSEC, 0)
-        success, frame = VidObj.read()
-        frames = list()
-        while success:
-            frame = cv2.cvtColor(np.array(frame), cv2.COLOR_BGR2RGB)
-            frame = np.asarray(frame)
-            frames.append(frame)
-            success, frame = VidObj.read()
+        frames = np.load(video_file[0])
+        frames = [(frame*255).astype(np.uint8)[..., :3] for frame in frames]
         return np.asarray(frames)
 
     @staticmethod
     def read_wave(bvp_file):
         """Reads a bvp signal file."""
-        bvp = []
         with open(bvp_file, "r") as f:
-            d = csv.reader(f)
-            for row in d:
-                bvp.append(float(row[0]))
+            str1 = f.read()
+            str1 = str1.split("\n")
+            bvp = [float(x) for x in str1[0].split()]
         return np.asarray(bvp)

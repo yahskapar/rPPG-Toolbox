@@ -16,7 +16,6 @@ import cv2
 import numpy as np
 from dataset.data_loader.BaseLoader import BaseLoader
 from tqdm import tqdm
-from utils.utils import sample
 
 
 class MAPURELoader(BaseLoader):
@@ -45,7 +44,7 @@ class MAPURELoader(BaseLoader):
         """
         super().__init__(name, data_path, config_data)
 
-    def get_data(self, data_path):
+    def get_raw_data(self, data_path):
         """Returns data directories under the path(For PURE dataset)."""
 
         data_dirs = glob.glob(data_path + os.sep + "*-*")
@@ -59,7 +58,7 @@ class MAPURELoader(BaseLoader):
             dirs.append({"index": index, "path": data_dir, "subject": subject})
         return dirs
 
-    def get_data_subset(self, data_dirs, begin, end):
+    def split_raw_data(self, data_dirs, begin, end):
         """Returns a subset of data dirs, split with begin and end values, 
         and ensures no overlapping subjects between splits"""
 
@@ -111,9 +110,9 @@ class MAPURELoader(BaseLoader):
         bvps = self.read_wave(
             os.path.join(data_dirs[i]['path'], "{0}.json".format(filename)))
 
-        bvps = sample(bvps, frames.shape[0])
+        bvps = BaseLoader.resample_ppg(bvps, frames.shape[0])
         frames_clips, bvps_clips = self.preprocess(frames, bvps, config_preprocess, config_preprocess.LARGE_FACE_BOX)
-        count, input_name_list, label_name_list = self.save_multi_process(frames_clips, bvps_clips, saved_filename)
+        input_name_list, label_name_list = self.save_multi_process(frames_clips, bvps_clips, saved_filename)
         file_list_dict[i] = input_name_list
 
     @staticmethod

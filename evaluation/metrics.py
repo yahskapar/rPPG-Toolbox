@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import torch
 from evaluation.post_process import *
+import statsmodels.api as sm
+import matplotlib as plt
 
 
 def read_label(dataset):
@@ -41,7 +43,20 @@ def calculate_metrics(predictions, labels, config):
     gt_hr_fft_all = list()
     predict_hr_peak_all = list()
     gt_hr_peak_all = list()
+
+    # T1
+    # subselect_out = ["s3", "s8", "s9", "s26", "s28", "s30", "s31", "s32", "s33", "s40", "s52", "s53", "s54", "s56"]
+    # T2
+    # subselect_out = ["s1", "s4", "s6", "s8", "s9", "s11", "s12", "s13", "s14", "s19", "s21", "s22", "s25", "s26", "s27", "s28", "s31", "s32", "s33", "s35", "s38", "s39", "s41", "s42", "s45", "s47", "s48", "s52", "s53", "s55"]
+    # T3
+    subselect_out = ["s5", "s8", "s9", "s10", "s13", "s14", "s17", "s22", "s25", "s26", "s28", "s30", "s32", "s33", "s35", "s37", "s40", "s47", "s48", "s49", "s50", "s52", "s53"]
+    print("{} subjects will be ignored!".format(len(subselect_out)))
+
     for index in predictions.keys():
+
+        if index in subselect_out:
+            continue
+
         prediction = _reform_data_from_dict(predictions[index])
         label = _reform_data_from_dict(labels[index])
 
@@ -60,6 +75,8 @@ def calculate_metrics(predictions, labels, config):
         predict_hr_fft_all.append(pred_hr_fft)
         predict_hr_peak_all.append(pred_hr_peak)
         gt_hr_peak_all.append(gt_hr_peak)
+        # Save prediction and use index in the filename
+        # Save gt_hr_fft and use index in the filename
     predict_hr_peak_all = np.array(predict_hr_peak_all)
     predict_hr_fft_all = np.array(predict_hr_fft_all)
     gt_hr_peak_all = np.array(gt_hr_peak_all)
@@ -107,3 +124,7 @@ def calculate_metrics(predictions, labels, config):
 
         else:
             raise ValueError("Wrong Test Metric Type")
+
+    # Save a Bland-Altman Plot of Test Results
+    sm.graphics.mean_diff_plot(gt_hr_fft_all, predict_hr_fft_all)
+    plt.pyplot.savefig('bland_altman_plot_T3_MFC_SS_MAUBFC.png')
