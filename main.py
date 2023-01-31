@@ -132,6 +132,8 @@ if __name__ == "__main__":
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
         elif config.TRAIN.DATA.DATASET == "UBFC":
             train_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TRAIN.DATA.DATASET == "PURE":
             train_loader = data_loader.PURELoader.PURELoader
         elif config.TRAIN.DATA.DATASET == "SCAMPS":
@@ -145,6 +147,8 @@ if __name__ == "__main__":
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
         elif config.VALID.DATA.DATASET == "UBFC":
             valid_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.VALID.DATA.DATASET == "MAUBFC":
+            valid_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.VALID.DATA.DATASET == "PURE":
             valid_loader = data_loader.PURELoader.PURELoader
         elif config.VALID.DATA.DATASET == "SCAMPS":

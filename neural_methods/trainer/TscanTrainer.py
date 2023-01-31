@@ -67,6 +67,10 @@ class TscanTrainer(BaseTrainer):
                 self.optimizer.zero_grad()
                 pred_ppg = self.model(data)
                 loss = self.criterion(pred_ppg, labels)
+
+                # Store into dict for PCA/t-SNE plots
+                # TODO: Figure out how to do this in a clean way
+
                 loss.backward()
                 self.optimizer.step()
                 self.scheduler.step()

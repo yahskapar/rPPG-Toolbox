@@ -41,6 +41,7 @@ def calculate_metrics(predictions, labels, config):
     gt_hr_fft_all = list()
     predict_hr_peak_all = list()
     gt_hr_peak_all = list()
+    result_dict = dict()
     for index in predictions.keys():
         prediction = _reform_data_from_dict(predictions[index])
         label = _reform_data_from_dict(labels[index])
@@ -52,14 +53,24 @@ def calculate_metrics(predictions, labels, config):
             diff_flag_test = True
         else:
             raise ValueError("Not supported label type in testing!")
-        gt_hr_fft, pred_hr_fft = calculate_metric_per_video(
+        gt_hr_fft, pred_hr_fft, label_ppg, pred_ppg = calculate_metric_per_video(
             prediction, label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='FFT')
-        gt_hr_peak, pred_hr_peak = calculate_metric_per_video(
+        gt_hr_peak, pred_hr_peak, label_ppg_peak, pred_ppg_peak = calculate_metric_per_video(
             prediction, label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='Peak')
         gt_hr_fft_all.append(gt_hr_fft)
         predict_hr_fft_all.append(pred_hr_fft)
         predict_hr_peak_all.append(pred_hr_peak)
         gt_hr_peak_all.append(gt_hr_peak)
+
+        # Store into dict for PCA/t-SNE plots
+        result_dict[index] = {
+            "gt_hr_fft": gt_hr_fft,
+            "pred_hr_fft": pred_hr_fft,
+            "label_ppg": label_ppg,
+            "pred_ppg": pred_ppg
+        }
+        
+    np.save("result_dict.npy", result_dict)
     predict_hr_peak_all = np.array(predict_hr_peak_all)
     predict_hr_fft_all = np.array(predict_hr_fft_all)
     gt_hr_peak_all = np.array(gt_hr_peak_all)
