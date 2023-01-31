@@ -167,6 +167,8 @@ if __name__ == "__main__":
             test_loader = data_loader.PURELoader.PURELoader
         elif config.TEST.DATA.DATASET == "SCAMPS":
             test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.TEST.DATA.DATASET == "VICARPPG2":
+            test_loader = data_loader.VICARPPG2Loader.VICARPPG2Loader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
 
