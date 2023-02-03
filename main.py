@@ -134,6 +134,12 @@ if __name__ == "__main__":
             train_loader = data_loader.UBFCLoader.UBFCLoader
         elif config.TRAIN.DATA.DATASET == "MAUBFC":
             train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC_A_B":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC_A_B_C":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC_A_B_C_D":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TRAIN.DATA.DATASET == "PURE":
             train_loader = data_loader.PURELoader.PURELoader
         elif config.TRAIN.DATA.DATASET == "SCAMPS":
@@ -148,6 +154,12 @@ if __name__ == "__main__":
         elif config.VALID.DATA.DATASET == "UBFC":
             valid_loader = data_loader.UBFCLoader.UBFCLoader
         elif config.VALID.DATA.DATASET == "MAUBFC":
+            valid_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.VALID.DATA.DATASET == "MAUBFC_A_B":
+            valid_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.VALID.DATA.DATASET == "MAUBFC_A_B_C":
+            valid_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.VALID.DATA.DATASET == "MAUBFC_A_B_C_D":
             valid_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.VALID.DATA.DATASET == "PURE":
             valid_loader = data_loader.PURELoader.PURELoader
@@ -167,6 +179,14 @@ if __name__ == "__main__":
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
         elif config.TEST.DATA.DATASET == "UBFC":
             test_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.TEST.DATA.DATASET == "MAUBFC":
+            test_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TEST.DATA.DATASET == "MAUBFC_A_B":
+            test_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TEST.DATA.DATASET == "MAUBFC_A_B_C":
+            test_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TEST.DATA.DATASET == "MAUBFC_A_B_C_D":
+            test_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TEST.DATA.DATASET == "PURE":
             test_loader = data_loader.PURELoader.PURELoader
         elif config.TEST.DATA.DATASET == "SCAMPS":

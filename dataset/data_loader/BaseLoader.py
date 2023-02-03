@@ -93,7 +93,7 @@ class BaseLoader(Dataset):
         label = np.float32(label)
         item_path = self.inputs[index]
         item_path_filename = item_path.split(os.sep)[-1]
-        split_idx = item_path_filename.index('_')
+        split_idx = item_path_filename.rindex('_')
         filename = item_path_filename[:split_idx]
         chunk_id = item_path_filename[split_idx + 6:].split('.')[0]
         return data, label, filename, chunk_id

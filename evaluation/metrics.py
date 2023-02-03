@@ -50,6 +50,7 @@ def calculate_metrics(predictions, labels, config):
                 config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "Raw":
             diff_flag_test = False
         elif config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized":
+        # elif config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "Normalized":
             diff_flag_test = True
         else:
             raise ValueError("Not supported label type in testing!")
@@ -70,7 +71,7 @@ def calculate_metrics(predictions, labels, config):
             "pred_ppg": pred_ppg
         }
         
-    np.save("result_dict.npy", result_dict)
+    np.save("MAUBFC_4x_train_result.npy", result_dict)
     predict_hr_peak_all = np.array(predict_hr_peak_all)
     predict_hr_fft_all = np.array(predict_hr_fft_all)
     gt_hr_peak_all = np.array(gt_hr_peak_all)
