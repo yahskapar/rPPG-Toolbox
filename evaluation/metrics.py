@@ -37,18 +37,25 @@ def _reform_data_from_dict(data):
 
 def calculate_metrics(predictions, labels, config):
     """Calculate rPPG Metrics (MAE, RMSE, MAPE, Pearson Coef.)."""
+
     predict_hr_fft_all = list()
     gt_hr_fft_all = list()
     predict_hr_peak_all = list()
     gt_hr_peak_all = list()
     for index in predictions.keys():
+
+        # print(index)
+        # if index in subselect_out:
+        #     continue
+
         prediction = _reform_data_from_dict(predictions[index])
         label = _reform_data_from_dict(labels[index])
 
         if config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "Standardized" or \
                 config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "Raw":
             diff_flag_test = False
-        elif config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized":
+        elif config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized" or \
+                config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "Normalized":
             diff_flag_test = True
         else:
             raise ValueError("Not supported label type in testing!")

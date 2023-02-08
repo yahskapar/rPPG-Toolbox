@@ -57,8 +57,11 @@ class BaseLoader(Dataset):
         assert (config_data.BEGIN < config_data.END)
         assert (config_data.BEGIN > 0 or config_data.BEGIN == 0)
         assert (config_data.END < 1 or config_data.END == 1)
+
         if config_data.DO_PREPROCESS:
             self.preprocess_dataset(self.raw_data_dirs, config_data.PREPROCESS, config_data.BEGIN, config_data.END)
+        elif config_data.DATASET == 'AFRL':
+            self.load_AFRL()
         else:
             if not os.path.exists(self.cached_path):
                 raise ValueError(self.dataset_name,
@@ -341,7 +344,7 @@ class BaseLoader(Dataset):
             count += 1
         return input_path_name_list, label_path_name_list
 
-    def multi_process_manager(self, data_dirs, config_preprocess, multi_process_quota=8):
+    def multi_process_manager(self, data_dirs, config_preprocess, multi_process_quota=2):
         """Allocate dataset preprocessing across multiple processes.
 
         Args:
@@ -422,9 +425,10 @@ class BaseLoader(Dataset):
             None (this function does save a file-list .csv file to self.file_list_path)
         """
 
+        # print(data_dirs)
         # Get data split based on begin and end indices.
         data_dirs_subset = self.split_raw_data(data_dirs, begin, end)
-
+        # print(data_dirs_subset)
         # generate a list of unique raw-data file names
         filename_list = []
         for i in range(len(data_dirs_subset)):
@@ -463,6 +467,19 @@ class BaseLoader(Dataset):
         self.inputs = inputs
         self.labels = labels
         self.preprocessed_data_len = len(inputs)
+
+    def load_AFRL(self):
+        """Loads the preprocessing data."""
+        inputs = glob.glob(os.path.join(self.cached_path, "*input*.npy"))
+        if inputs == []:
+            raise ValueError(self.name+' dataset loading data error!')
+        inputs = sorted(inputs) # sort input file name list
+        labels = [input.replace("input", "label") for input in inputs]
+        assert (len(inputs) == len(labels))
+        self.inputs = inputs
+        self.labels = labels
+        self.preprocessed_data_len = len(inputs)
+        print("loaded data len:", self.preprocessed_data_len)
 
     @staticmethod
     def diff_normalize_data(data):
