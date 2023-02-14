@@ -233,6 +233,8 @@ if __name__ == "__main__":
             unsupervised_loader = data_loader.PURELoader.PURELoader
         elif config.UNSUPERVISED.DATA.DATASET == "SCAMPS":
             unsupervised_loader = data_loader.SCAMPSLoader.SCAMPSLoader
+        elif config.UNSUPERVISED.DATA.DATASET == "AFRL":
+            unsupervised_loader = data_loader.AFRLRawLoader.AFRLRawLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, and SCAMPS.")
 

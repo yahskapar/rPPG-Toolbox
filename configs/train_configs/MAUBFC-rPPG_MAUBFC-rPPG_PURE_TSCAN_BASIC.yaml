@@ -1,5 +1,5 @@
 BASE: ['']
-TOOLBOX_MODE: "train_and_test"      # "train_and_test"  or "only_test"
+TOOLBOX_MODE: "only_test"      # "train_and_test"  or "only_test"
 # TRAIN:
 #   BATCH_SIZE: 4
 #   EPOCHS: 30
@@ -27,51 +27,24 @@ TOOLBOX_MODE: "train_and_test"      # "train_and_test"  or "only_test"
 #       LARGE_BOX_COEF: 1.5
 #       H: 72
 #       W: 72
-TRAIN:
-  BATCH_SIZE: 4
-  EPOCHS: 30
-  LR: 9e-3
-  MODEL_FILE_NAME: MAPURE_MAPURE_AFRL_tscan
-  DATA:
-    FS: 30
-    DATASET: MAPURE
-    DO_PREPROCESS: False               # if first time, should be true
-    DATA_FORMAT: NDCHW
-    DATA_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/datasets/MAPURE/PURE/RawData"                     # Raw dataset path, need to be updated
-    CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold"    # Processed dataset save path, need to be updated
-    EXP_DATA_NAME: ""
-    BEGIN: 0.0
-    END: 0.8
-    PREPROCESS :
-      DATA_TYPE: ['Normalized','Standardized']
-      LABEL_TYPE: Normalized
-      DO_CHUNK: True
-      CHUNK_LENGTH: 180
-      DYNAMIC_DETECTION: False
-      DYNAMIC_DETECTION_FREQUENCY : 180
-      CROP_FACE: True
-      LARGE_FACE_BOX: True
-      LARGE_BOX_COEF: 1.5
-      H: 72
-      W: 72
 # TRAIN:
 #   BATCH_SIZE: 4
 #   EPOCHS: 30
 #   LR: 9e-3
-#   MODEL_FILE_NAME: PURE_PURE_AFRL_tscan
+#   MODEL_FILE_NAME: MAPURE_MAPURE_AFRL_tscan
 #   DATA:
 #     FS: 30
-#     DATASET: PURE
-#     DO_PREPROCESS: True               # if first time, should be true
+#     DATASET: MAPURE
+#     DO_PREPROCESS: False               # if first time, should be true
 #     DATA_FORMAT: NDCHW
-#     DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/PURE/RawData"                     # Raw dataset path, need to be updated
+#     DATA_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/datasets/MAPURE/PURE/RawData"                     # Raw dataset path, need to be updated
 #     CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold"    # Processed dataset save path, need to be updated
 #     EXP_DATA_NAME: ""
 #     BEGIN: 0.0
 #     END: 0.8
 #     PREPROCESS :
-#       DATA_TYPE: ['DiffNormalized','Standardized']
-#       LABEL_TYPE: DiffNormalized
+#       DATA_TYPE: ['Normalized','Standardized']
+#       LABEL_TYPE: Normalized
 #       DO_CHUNK: True
 #       CHUNK_LENGTH: 180
 #       DYNAMIC_DETECTION: False
@@ -81,6 +54,33 @@ TRAIN:
 #       LARGE_BOX_COEF: 1.5
 #       H: 72
 #       W: 72
+TRAIN:
+  BATCH_SIZE: 4
+  EPOCHS: 30
+  LR: 9e-3
+  MODEL_FILE_NAME: PURE_PURE_AFRL_tscan
+  DATA:
+    FS: 30
+    DATASET: PURE
+    DO_PREPROCESS: False               # if first time, should be true
+    DATA_FORMAT: NDCHW
+    DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/PURE/RawData"                     # Raw dataset path, need to be updated
+    CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold"    # Processed dataset save path, need to be updated
+    EXP_DATA_NAME: ""
+    BEGIN: 0.0
+    END: 0.8
+    PREPROCESS :
+      DATA_TYPE: ['DiffNormalized','Standardized']
+      LABEL_TYPE: DiffNormalized
+      DO_CHUNK: True
+      CHUNK_LENGTH: 180
+      DYNAMIC_DETECTION: False
+      DYNAMIC_DETECTION_FREQUENCY : 180
+      CROP_FACE: True
+      LARGE_FACE_BOX: True
+      LARGE_BOX_COEF: 1.5
+      H: 72
+      W: 72
 VALID:
   DATA:
     FS: 30
@@ -104,40 +104,15 @@ VALID:
       LARGE_BOX_COEF: 1.5
       H: 72
       W: 72
-# TEST:
-#   METRICS: ['MAE','RMSE','MAPE','Pearson']
-#   USE_LAST_EPOCH: True                     # to use provided validation dataset to find the best epoch, should be false
-#   DATA:
-#     FS: 30
-#     DATASET: PURE
-#     DO_PREPROCESS: False                    # if first time, should be true
-#     DATA_FORMAT: NDCHW
-#     DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/PURE/RawData"                     # Raw dataset path, need to be updated
-#     CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold"    # Processed dataset save path, need to be updated
-#     EXP_DATA_NAME: ""
-#     BEGIN: 0.0
-#     END: 1.0
-#     PREPROCESS:
-#       DATA_TYPE: [ 'DiffNormalized','Standardized' ]
-#       LABEL_TYPE: DiffNormalized
-#       DO_CHUNK: True
-#       CHUNK_LENGTH: 180
-#       DYNAMIC_DETECTION: False
-#       DYNAMIC_DETECTION_FREQUENCY : 180
-#       CROP_FACE: True
-#       LARGE_FACE_BOX: True
-#       LARGE_BOX_COEF: 1.5
-#       H: 72
-#       W: 72
 TEST:
   METRICS: ['MAE','RMSE','MAPE','Pearson']
   USE_LAST_EPOCH: True                     # to use provided validation dataset to find the best epoch, should be false
   DATA:
     FS: 30
-    DATASET: AFRL
+    DATASET: PURE
     DO_PREPROCESS: False                    # if first time, should be true
     DATA_FORMAT: NDCHW
-    DATA_PATH: "/playpen-temp/users/xliu0/AFRL"                     # Raw dataset path, need to be updated
+    DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/PURE/RawData"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold"    # Processed dataset save path, need to be updated
     EXP_DATA_NAME: ""
     BEGIN: 0.0
@@ -154,6 +129,31 @@ TEST:
       LARGE_BOX_COEF: 1.5
       H: 72
       W: 72
+# TEST:
+#   METRICS: ['MAE','RMSE','MAPE','Pearson']
+#   USE_LAST_EPOCH: True                     # to use provided validation dataset to find the best epoch, should be false
+#   DATA:
+#     FS: 30
+#     DATASET: AFRL
+#     DO_PREPROCESS: False                    # if first time, should be true
+#     DATA_FORMAT: NDCHW
+#     DATA_PATH: "/playpen-temp/users/xliu0/AFRL"                     # Raw dataset path, need to be updated
+#     CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold"    # Processed dataset save path, need to be updated
+#     EXP_DATA_NAME: ""
+#     BEGIN: 0.0
+#     END: 1.0
+#     PREPROCESS:
+#       DATA_TYPE: [ 'DiffNormalized','Standardized' ]
+#       LABEL_TYPE: DiffNormalized
+#       DO_CHUNK: True
+#       CHUNK_LENGTH: 180
+#       DYNAMIC_DETECTION: False
+#       DYNAMIC_DETECTION_FREQUENCY : 180
+#       CROP_FACE: True
+#       LARGE_FACE_BOX: True
+#       LARGE_BOX_COEF: 1.5
+#       H: 72
+#       W: 72
 DEVICE: cuda:0
 NUM_OF_GPU_TRAIN: 1
 LOG:
@@ -166,5 +166,5 @@ MODEL:
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
-  MODEL_PATH:   ""
+  MODEL_PATH:   "PreTrainedModels/UBFC_SizeW72_SizeH72_ClipLength180_DataTypeDiffNormalized_Standardized_LabelTypeDiffNormalized_Large_boxTrue_Large_size1.5_Dyamic_DetFalse_det_len180/UBFC_UBFC_PURE_tscan_Epoch29.pth"
                    
