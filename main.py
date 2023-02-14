@@ -134,6 +134,12 @@ if __name__ == "__main__":
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, MMPD, and SCAMPS.")
         elif config.TRAIN.DATA.DATASET == "UBFC":
             train_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC_PHYST2":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC_PHYST3":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TRAIN.DATA.DATASET == "PURE":
             train_loader = data_loader.PURELoader.PURELoader
         elif config.TRAIN.DATA.DATASET == "SCAMPS":
@@ -178,10 +184,14 @@ if __name__ == "__main__":
             test_loader = data_loader.PURELoader.PURELoader
         elif config.TEST.DATA.DATASET == "SCAMPS":
             test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
-        ###################################
         elif config.TEST.DATA.DATASET == "MMPD":
             test_loader = data_loader.MMPDLoader.MMPDLoader
-        ###################################
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T1_FaceCropping_Median_1-1_HC":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T2_FaceCropping_Median_1-1_HC":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
+        elif config.TEST.DATA.DATASET == "UBFCPHYS_T3_FaceCropping_Median_1-1_HC":
+            test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, MMPD, and SCAMPS.")
 

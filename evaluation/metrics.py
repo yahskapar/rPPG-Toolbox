@@ -41,14 +41,27 @@ def calculate_metrics(predictions, labels, config):
     gt_hr_fft_all = list()
     predict_hr_peak_all = list()
     gt_hr_peak_all = list()
+
+    # T1
+    # subselect_out = ["s3", "s8", "s9", "s26", "s28", "s30", "s31", "s32", "s33", "s40", "s52", "s53", "s54", "s56"]
+    # T2
+    subselect_out = ["s1", "s4", "s6", "s8", "s9", "s11", "s12", "s13", "s14", "s19", "s21", "s22", "s25", "s26", "s27", "s28", "s31", "s32", "s33", "s35", "s38", "s39", "s41", "s42", "s45", "s47", "s48", "s52", "s53", "s55"]
+    # T3
+    # subselect_out = ["s5", "s8", "s9", "s10", "s13", "s14", "s17", "s22", "s25", "s26", "s28", "s30", "s32", "s33", "s35", "s37", "s40", "s47", "s48", "s49", "s50", "s52", "s53"]
+    print("{} subjects will be ignored!".format(len(subselect_out)))
+
     for index in predictions.keys():
+
+        if index in subselect_out:
+            continue
+
         prediction = _reform_data_from_dict(predictions[index])
         label = _reform_data_from_dict(labels[index])
 
         if config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Standardized" or \
                 config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Raw":
             diff_flag_test = False
-        elif config.TEST.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized":
+        elif config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized" or config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "Normalized":
             diff_flag_test = True
         else:
             raise ValueError("Not supported label type in testing!")
