@@ -76,5 +76,5 @@ def calculate_metric_per_video(predictions, labels, fs=30, diff_flag=True, use_b
         hr_label = _calculate_peak_hr(labels, fs=fs)
     else:
         raise ValueError('Please use FFT or Peak to calculate your HR.')
-    return hr_label, hr_pred
+    return hr_label, hr_pred, labels, predictions
 

@@ -59,6 +59,8 @@ class BaseLoader(Dataset):
         assert (config_data.END < 1 or config_data.END == 1)
         if config_data.DO_PREPROCESS:
             self.preprocess_dataset(self.raw_data_dirs, config_data.PREPROCESS, config_data.BEGIN, config_data.END)
+        elif config_data.DATASET == 'AFRL':
+            self.load_AFRL()
         else:
             if not os.path.exists(self.cached_path):
                 raise ValueError(self.dataset_name,
@@ -169,7 +171,7 @@ class BaseLoader(Dataset):
             f_c = frames.copy()
             if data_type == "Raw":
                 data.append(f_c)
-            elif data_type == "DiffNormalized":
+            elif data_type == "Normalized":
                 data.append(BaseLoader.diff_normalize_data(f_c))
             elif data_type == "Standardized":
                 data.append(BaseLoader.standardized_data(f_c))
@@ -178,7 +180,7 @@ class BaseLoader(Dataset):
         data = np.concatenate(data, axis=-1)  # concatenate all channels
         if config_preprocess.LABEL_TYPE == "Raw":
             pass
-        elif config_preprocess.LABEL_TYPE == "DiffNormalized":
+        elif config_preprocess.LABEL_TYPE == "Normalized":
             bvps = BaseLoader.diff_normalize_label(bvps)
         elif config_preprocess.LABEL_TYPE == "Standardized":
             bvps = BaseLoader.standardized_label(bvps)
@@ -218,11 +220,12 @@ class BaseLoader(Dataset):
         else:
             face_box_coor = face_zone[0]
         if use_larger_box:
-            face_box_coor[0] = max(0, face_box_coor[0] - (larger_box_coef - 1.0) / 2 * face_box_coor[2])
-            face_box_coor[1] = max(0, face_box_coor[1] - (larger_box_coef - 1.0) / 2 * face_box_coor[3])
-            face_box_coor[2] = larger_box_coef * face_box_coor[2]
-            face_box_coor[3] = larger_box_coef * face_box_coor[3]
-        return face_box_coor
+            face_box_new_coord = [0, 0, 0, 0]
+            face_box_new_coord[0] = max(0, face_box_coor[0] - (larger_box_coef - 1.0) / 2 * face_box_coor[2])
+            face_box_new_coord[1] = max(0, face_box_coor[1] - (larger_box_coef - 1.0) / 2 * face_box_coor[3])
+            face_box_new_coord[2] = larger_box_coef * face_box_coor[2]
+            face_box_new_coord[3] = larger_box_coef * face_box_coor[3]
+        return face_box_new_coord
 
     def face_crop_resize(self, frames, use_dynamic_detection, detection_freq, width, height,
                          use_larger_box, use_face_detection, larger_box_coef):
@@ -251,11 +254,19 @@ class BaseLoader(Dataset):
         face_region_all = []
         # Perform face detection by num_dynamic_det" times.
         for idx in range(num_dynamic_det):
+            # if idx > 3:
+            #     break
             if use_face_detection:
-                face_region_all.append(self.face_detection(frames[detection_freq * idx], use_larger_box, larger_box_coef))
+                face_detection_result = self.face_detection(frames[detection_freq * idx], use_larger_box, larger_box_coef)
+                # print(face_detection_result)
+                face_region_all.append(face_detection_result)
+            # elif use_face_detection_median:
+            #     face_region_all.append(self.face_detection(frames[1 * idx], use_larger_box, larger_box_coef))
             else:
                 face_region_all.append([0, 0, frames.shape[1], frames.shape[2]])
         face_region_all = np.asarray(face_region_all, dtype='int')
+        face_region_median = np.median(face_region_all, axis=0).astype('int')
+        # print(face_region_median)
 
         # Frame Resizing
         resized_frames = np.zeros((frames.shape[0], height, width, 3))
@@ -266,7 +277,9 @@ class BaseLoader(Dataset):
             else:  # use the first region obtrained from the first frame.
                 reference_index = 0
             if use_face_detection:
-                face_region = face_region_all[reference_index]
+                # CHANGE ME
+                # face_region = face_region_all[reference_index]
+                face_region = face_region_median
                 frame = frame[max(face_region[1], 0):min(face_region[1] + face_region[3], frame.shape[0]),
                         max(face_region[0], 0):min(face_region[0] + face_region[2], frame.shape[1])]
             resized_frames[i] = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
@@ -351,7 +364,6 @@ class BaseLoader(Dataset):
         Returns:
             file_list_dict(Dict): Dictionary containing information regarding processed data ( path names)
         """
-        print('Preprocessing dataset...')
         file_num = len(data_dirs)
         choose_range = range(0, file_num)
         pbar = tqdm(list(choose_range))
@@ -363,6 +375,7 @@ class BaseLoader(Dataset):
         running_num = 0  # number of running processes
 
         # in range of number of files to process
+        print('Preprocessing dataset...')
         for i in choose_range:
             process_flag = True
             while process_flag:  # ensure that every i creates a process
@@ -464,29 +477,42 @@ class BaseLoader(Dataset):
         self.labels = labels
         self.preprocessed_data_len = len(inputs)
 
+    def load_AFRL(self):
+        """Loads the preprocessing data."""
+        inputs = glob.glob(os.path.join(self.cached_path, "*input*.npy"))
+        if inputs == []:
+            raise ValueError(self.name+' dataset loading data error!')
+        inputs = sorted(inputs) # sort input file name list
+        labels = [input.replace("input", "label") for input in inputs]
+        assert (len(inputs) == len(labels))
+        self.inputs = inputs
+        self.labels = labels
+        self.preprocessed_data_len = len(inputs)
+        print("loaded data len:", self.preprocessed_data_len)
+
     @staticmethod
     def diff_normalize_data(data):
         """Calculate discrete difference in video data along the time-axis and nornamize by its standard deviation."""
         n, h, w, c = data.shape
-        diffnormalized_len = n - 1
-        diffnormalized_data = np.zeros((diffnormalized_len, h, w, c), dtype=np.float32)
-        diffnormalized_data_padding = np.zeros((1, h, w, c), dtype=np.float32)
-        for j in range(diffnormalized_len - 1):
-            diffnormalized_data[j, :, :, :] = (data[j + 1, :, :, :] - data[j, :, :, :]) / (
+        normalized_len = n - 1
+        normalized_data = np.zeros((normalized_len, h, w, c), dtype=np.float32)
+        normalized_data_padding = np.zeros((1, h, w, c), dtype=np.float32)
+        for j in range(normalized_len - 1):
+            normalized_data[j, :, :, :] = (data[j + 1, :, :, :] - data[j, :, :, :]) / (
                     data[j + 1, :, :, :] + data[j, :, :, :] + 1e-7)
-        diffnormalized_data = diffnormalized_data / np.std(diffnormalized_data)
-        diffnormalized_data = np.append(diffnormalized_data, diffnormalized_data_padding, axis=0)
-        diffnormalized_data[np.isnan(diffnormalized_data)] = 0
-        return diffnormalized_data
+        normalized_data = normalized_data / np.std(normalized_data)
+        normalized_data = np.append(normalized_data, normalized_data_padding, axis=0)
+        normalized_data[np.isnan(normalized_data)] = 0
+        return normalized_data
 
     @staticmethod
     def diff_normalize_label(label):
         """Calculate discrete difference in labels along the time-axis and normalize by its standard deviation."""
         diff_label = np.diff(label, axis=0)
-        diffnormalized_label = diff_label / np.std(diff_label)
-        diffnormalized_label = np.append(diffnormalized_label, np.zeros(1), axis=0)
-        diffnormalized_label[np.isnan(diffnormalized_label)] = 0
-        return diffnormalized_label
+        normalized_label = diff_label / np.std(diff_label)
+        normalized_label = np.append(normalized_label, np.zeros(1), axis=0)
+        normalized_label[np.isnan(normalized_label)] = 0
+        return normalized_label
 
     @staticmethod
     def standardized_data(data):

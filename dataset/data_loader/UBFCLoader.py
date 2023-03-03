@@ -70,7 +70,7 @@ class UBFCLoader(BaseLoader):
         saved_filename = data_dirs[i]['index']
 
         frames = self.read_video(
-            os.path.join(data_dirs[i]['path'],"vid.avi"))
+            glob.glob(os.path.join(data_dirs[i]['path'],'*.avi')))
         bvps = self.read_wave(
             os.path.join(data_dirs[i]['path'],"ground_truth.txt"))
             
@@ -81,7 +81,7 @@ class UBFCLoader(BaseLoader):
     @staticmethod
     def read_video(video_file):
         """Reads a video file, returns frames(T, H, W, 3) """
-        VidObj = cv2.VideoCapture(video_file)
+        VidObj = cv2.VideoCapture(video_file[0])
         VidObj.set(cv2.CAP_PROP_POS_MSEC, 0)
         success, frame = VidObj.read()
         frames = list()
