@@ -7,7 +7,6 @@ import cv2
 import glob
 import numpy as np
 import re
-import dlib
 
 from scipy.__config__ import get_info
 from .BaseLoader import BaseLoader
@@ -111,8 +110,14 @@ class MMPDLoader(BaseLoader):
         filename = os.path.split(data_dirs[i]['path'])[-1]
         saved_filename = 'subject' + str(data_dirs[i]['subject']) + '_' + str(data_dirs[i]['index'])
 
-        frames, bvps = self.read_mat(data_dirs[i]['path'])
+        frames, bvps, accept_file = self.read_mat(data_dirs[i]['path'])
         frames = (np.round(frames * 255)).astype(np.uint8)
+
+        if accept_file is False:
+            return
+        else:
+            pass
+
         target_length = frames.shape[0]
         bvps = BaseLoader.resample_ppg(bvps, target_length)
         frames_clips, bvps_clips = self.preprocess(frames, bvps, config_preprocess)
@@ -122,6 +127,7 @@ class MMPDLoader(BaseLoader):
 
     @staticmethod
     def read_mat(mat_file):
+        accept_file = True
         try:
             mat = sio.loadmat(mat_file)
         except:
@@ -129,5 +135,19 @@ class MMPDLoader(BaseLoader):
                 print(mat_file)
         frames = np.array(mat['video'])
         bvps = np.array(mat['GT_ppg']).T.reshape(-1)
-        return frames, bvps
+
+        skin_color = np.array(mat['skin_color'])
+        motion = np.array(mat['motion'])
+        light = np.array(mat['light'])
+
+        if np.any(skin_color == 3) and np.any(np.isin(motion, ['Stationary', 'Rotation', 'Talking', 'Walking'])) and np.any(np.isin(light, ['LED-low', 'LED-high', 'Incandescent'])):
+            pass
+        else:
+            accept_file=False
+            return frames, bvps, accept_file
+
+        print(np.array(mat['light']))
+        print(np.array(mat['motion']))
+        print(np.array(mat['skin_color']))
+        return frames, bvps, accept_file
 

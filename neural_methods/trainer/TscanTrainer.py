@@ -171,8 +171,14 @@ class TscanTrainer(BaseTrainer):
                 labels_test = labels_test[:(N * D) // self.base_len * self.base_len]
                 pred_ppg_test = self.model(data_test)
                 for idx in range(batch_size):
-                    subj_index = test_batch[2][idx]
-                    sort_index = int(test_batch[3][idx])
+                    if self.config.TEST.DATA.DATASET == 'AFRL':
+                        subj_index = test_batch[2][idx].split('C')[0]
+                        print(subj_index)
+                        sort_index = test_batch[2][idx].split('C')[1]
+                        print(sort_index)
+                    else:
+                        subj_index = test_batch[2][idx]
+                        sort_index = int(test_batch[3][idx])
                     if subj_index not in predictions.keys():
                         predictions[subj_index] = dict()
                         labels[subj_index] = dict()

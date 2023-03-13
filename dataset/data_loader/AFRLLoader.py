@@ -47,7 +47,6 @@ class AFRLLoader(BaseLoader):
         return data_dirs_new
 
     def preprocess_dataset_subprocess(self, data_dirs, config_preprocess, i):
-        print
         """   invoked by preprocess_dataset for multi_process.   """
         file_info = data_dirs[i]
         path = file_info[0]

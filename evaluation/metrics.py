@@ -65,37 +65,78 @@ def calculate_metrics(predictions, labels, config):
 
     # No Motion
     # tasks = ["T2", "T8"]
+    # tasks = ["T2"]
 
     # Small Motion
     # tasks = ["T3", "T9"]
+    # tasks = ["T3"]
 
     # Medium Motion
     # tasks = ["T4", "T10"]
 
     # Large Motion
     # tasks = ["T5", "T11"]
+    # tasks = ["T5"]
 
     # Random Motion
     # tasks = ["T6", "T12"]
 
-    # All tasks
-    tasks = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"]
+    # All regular bg tasks
+    # tasks = ["T1", "T2", "T3", "T4", "T5", "T6"]
 
+    # All tasks
+    # tasks = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"]
+
+    # video_predictions = {}
+    # video_labels = {}
+
+    # for key, value in predictions.items():
+    #     prefix = key.split('C')[0]
+    #     video_predictions.setdefault(prefix, {})
+    #     video_predictions[prefix] += value
+
+    # for key, value in labels.items():
+    #     prefix = key.split('C')[0]
+    #     video_labels.setdefault(prefix, {})
+    #     video_labels[prefix] += value
+
+    # for index in video_predictions.keys():
     for index in predictions.keys():
+        
+        # np.save('Predictions_AFRL.npy', predictions.detach().numpy())
+        # print('Saved the preds...')
+        # exit()
+
+        # For MMPD
+        # print(index)
 
         # For AFRL, first ignore tasks we don't care about
-        if not any(s in index for s in tasks):
-            continue
-        print(index)
+        # if not any(index.endswith(s) for s in tasks):
+        #     continue
+        # print(index)
 
         # For UBFC-PHYS filtering
         # if index in subselect_out:
         #     continue
 
         # For PURE
-        # task_number = index[-2::]
+        subject_id = index[:-2]
+        print(subject_id)
+        task_number = index[-2::]
         # if task_number != "02":
         #     continue    # We only want to evaluate videos related to the speech task
+        if subject_id == "1" or subject_id == "2" or subject_id == "3" or subject_id == "4" or subject_id == "5" or subject_id == "6":
+            print('Skipped subject!')
+            continue
+        elif task_number != "04" or task_number != "06":     # Skip all tasks but T2
+            print('Skipped task!')
+            print(task_number)
+            continue    #
+
+        # print(video_predictions[index])
+        # print(video_labels[index])
+        # prediction = _reform_data_from_dict(video_predictions[index])
+        # label = _reform_data_from_dict(video_labels[index])
 
         prediction = _reform_data_from_dict(predictions[index])
         label = _reform_data_from_dict(labels[index])
@@ -103,7 +144,7 @@ def calculate_metrics(predictions, labels, config):
         if config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Standardized" or \
                 config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Raw":
             diff_flag_test = False
-        elif config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized" or config.TRAIN.DATA.PREPROCESS.LABEL_TYPE == "Normalized":
+        elif config.TEST.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized" or config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Normalized":
             diff_flag_test = True
         else:
             raise ValueError("Not supported label type in testing!")
@@ -116,17 +157,54 @@ def calculate_metrics(predictions, labels, config):
         predict_hr_peak_all.append(pred_hr_peak)
         gt_hr_peak_all.append(gt_hr_peak)
 
-        # Store into dict for PCA/t-SNE plots
-        result_dict[index] = {
-            "gt_hr_fft": gt_hr_fft,
-            "pred_hr_fft": pred_hr_fft,
-            "label_ppg": label_ppg,
-            "pred_ppg": pred_ppg
-        }
+        # sampling_rate = config.TEST.DATA.FS     # in seconds
+        # sampling_window = 30    # in seconds
+        # chunk_size = sampling_window * sampling_rate
 
-    filename = config.TRAIN.MODEL_FILE_NAME + "_result.npy"
-    file_path = os.path.join("/playpen-nas-ssd/akshay/UNC_Google_Physio/rPPG-Toolbox/dicts_for_paper", filename)
-    np.save(file_path, result_dict)
+        # temp_predict_hr_fft_all = list()
+        # temp_gt_hr_fft_all = list()
+        # temp_predict_hr_peak_all = list()
+        # temp_gt_hr_peak_all = list()
+
+        # for i in range(0, len(prediction), chunk_size):
+        #     chunk_pred = prediction[i:i+chunk_size]
+        #     chunk_label = label[i:i+chunk_size]
+
+        #     print(f'The pred shape is: {np.shape(chunk_pred)}')
+        #     print(f'The label shape is: {np.shape(chunk_label)}')
+
+        #     if config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Standardized" or \
+        #             config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Raw":
+        #         diff_flag_test = False
+        #     elif config.TEST.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized" or config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Normalized":
+        #         diff_flag_test = True
+        #     else:
+        #         raise ValueError("Not supported label type in testing!")
+        #     gt_hr_fft, pred_hr_fft, label_ppg, pred_ppg = calculate_metric_per_video(
+        #         chunk_pred, chunk_label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='FFT')
+        #     gt_hr_peak, pred_hr_peak, label_ppg_peak, pred_ppg_peak = calculate_metric_per_video(
+        #         chunk_pred, chunk_label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='Peak')
+        #     gt_hr_fft_all.append(gt_hr_fft)
+        #     predict_hr_fft_all.append(pred_hr_fft)
+        #     predict_hr_peak_all.append(pred_hr_peak)
+        #     gt_hr_peak_all.append(gt_hr_peak)
+        #     temp_gt_hr_fft_all.append(gt_hr_fft)
+        #     temp_predict_hr_fft_all.append(pred_hr_fft)
+        #     temp_predict_hr_peak_all.append(pred_hr_peak)
+        #     temp_gt_hr_peak_all.append(gt_hr_peak)
+
+    #     # Store into dict for PCA/t-SNE plots
+    #     # This is broken, FIX TODO!!!
+    #     result_dict[index] = {
+    #         "gt_hr_fft": np.mean(temp_gt_hr_fft_all),
+    #         "pred_hr_fft": np.mean(temp_predict_hr_fft_all),
+    #         "label_ppg": label_ppg,
+    #         "pred_ppg": pred_ppg
+    #     }
+
+    # filename = config.TRAIN.MODEL_FILE_NAME + "_result.npy"
+    # file_path = os.path.join("/playpen-nas-ssd/akshay/UNC_Google_Physio/rPPG-Toolbox/dicts_for_paper", filename)
+    # np.save(file_path, result_dict)
 
     predict_hr_peak_all = np.array(predict_hr_peak_all)
     predict_hr_fft_all = np.array(predict_hr_fft_all)

@@ -15,6 +15,13 @@ from unsupervised_methods.methods.PBV import *
 from unsupervised_methods.methods.POS_WANG import *
 from tqdm import tqdm
 
+def _reform_data_from_dict(data):
+    """Helper func for calculate metrics: reformat predictions and labels from dicts. """
+    sort_data = sorted(data.items(), key=lambda x: x[0])
+    sort_data = [i[1] for i in sort_data]
+    sort_data = torch.cat(sort_data, dim=0)
+    return np.reshape(sort_data.cpu(), (-1))
+
 
 def unsupervised_predict(config, data_loader, method_name):
     """ Model evaluation on the testing dataset."""
@@ -42,25 +49,44 @@ def unsupervised_predict(config, data_loader, method_name):
     # tasks = ["T6", "T12"]
 
     # All tasks
-    # tasks = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"]
+    tasks = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"]
 
     # For V2 of UBFC-PHYS loader (all 168 vids)
     # T1
-    subselect_out_T1 = ["s3_T1", "s8_T1", "s9_T1", "s26_T1", "s28_T1", "s30_T1", "s31_T1", "s32_T1", "s33_T1", "s40_T1", "s52_T1", "s53_T1", "s54_T1", "s56_T1"]
-    # T2
-    subselect_out_T2 = ["s1_T2", "s4_T2", "s6_T2", "s8_T2", "s9_T2", "s11_T2", "s12_T2", "s13_T2", "s14_T2", "s19_T2", "s21_T2", "s22_T2", "s25_T2", "s26_T2", "s27_T2", "s28_T2", "s31_T2", "s32_T2", "s33_T2", "s35_T2", "s38_T2", "s39_T2", "s41_T2", "s42_T2", "s45_T2", "s47_T2", "s48_T2", "s52_T2", "s53_T2", "s55_T2"]
-    # T3
-    subselect_out_T3 = ["s5_T3", "s8_T3", "s9_T3", "s10_T3", "s13_T3", "s14_T3", "s17_T3", "s22_T3", "s25_T3", "s26_T3", "s28_T3", "s30_T3", "s32_T3", "s33_T3", "s35_T3", "s37_T3", "s40_T3", "s47_T3", "s48_T3", "s49_T3", "s50_T3", "s52_T3", "s53_T3"]
+    # subselect_out_T1 = ["s3_T1", "s8_T1", "s9_T1", "s26_T1", "s28_T1", "s30_T1", "s31_T1", "s32_T1", "s33_T1", "s40_T1", "s52_T1", "s53_T1", "s54_T1", "s56_T1"]
+    # # T2
+    # subselect_out_T2 = ["s1_T2", "s4_T2", "s6_T2", "s8_T2", "s9_T2", "s11_T2", "s12_T2", "s13_T2", "s14_T2", "s19_T2", "s21_T2", "s22_T2", "s25_T2", "s26_T2", "s27_T2", "s28_T2", "s31_T2", "s32_T2", "s33_T2", "s35_T2", "s38_T2", "s39_T2", "s41_T2", "s42_T2", "s45_T2", "s47_T2", "s48_T2", "s52_T2", "s53_T2", "s55_T2"]
+    # # T3
+    # subselect_out_T3 = ["s5_T3", "s8_T3", "s9_T3", "s10_T3", "s13_T3", "s14_T3", "s17_T3", "s22_T3", "s25_T3", "s26_T3", "s28_T3", "s30_T3", "s32_T3", "s33_T3", "s35_T3", "s37_T3", "s40_T3", "s47_T3", "s48_T3", "s49_T3", "s50_T3", "s52_T3", "s53_T3"]
 
-    subselect_out = subselect_out_T1 + subselect_out_T2 + subselect_out_T3
-    print("{} subjects will be ignored!".format(len(subselect_out)))
+    # subselect_out = subselect_out_T1 + subselect_out_T2 + subselect_out_T3
+    # print("{} subjects will be ignored!".format(len(subselect_out)))
+
+    # data = dict()
+    # labels = dict()
 
     sbar = tqdm(data_loader["unsupervised"], ncols=80)
+    # for _, test_batch in enumerate(sbar):
+    #     batch_size = test_batch[0].shape[0]
+    #     for idx in range(batch_size):
+    #         subj_index = test_batch[2][idx].split('C')[0]
+    #         print(subj_index)
+    #         sort_index = test_batch[2][idx].split('C')[1]
+    #         print(sort_index)
+    #         if subj_index not in data.keys():
+    #             data[subj_index] = dict()
+    #             labels[subj_index] = dict()
+    #         data[subj_index][sort_index] = test_batch[0][idx]
+    #         labels[subj_index][sort_index] = test_batch[1][idx]
+
+    # print(preds_dict.keys())
+    # exit()
     for _, test_batch in enumerate(sbar):
+    # for index in data.keys():
         # For AFRL, first ignore tasks we don't care about
-        # if not any(s in test_batch[2][0] for s in tasks):
-        #     continue
-        # print(test_batch[2][0])
+        if not any(test_batch[2][0].split('C')[0].endswith(s) for s in tasks):
+            print('Skipped!')
+            continue
         
         # For PURE
         # task_number = test_batch[2][0][-2::]
@@ -69,14 +95,14 @@ def unsupervised_predict(config, data_loader, method_name):
         # print(test_batch[2][0])
 
         # For UBFC-PHYS filtering
-        if test_batch[2][0] in subselect_out:
-            continue
+        # if test_batch[2][0] in subselect_out:
+        #     continue
 
         batch_size = test_batch[0].shape[0]
         for idx in range(batch_size):
             data_input, labels_input = test_batch[0][idx].cpu().numpy(), test_batch[1][idx].cpu().numpy()
             # Temp for AFRL
-            # data_input = data_input[:, :, :, 3:]
+            data_input = data_input[:, :, :, 3:]
             if method_name == "POS":
                 # BVP = POS_WANG(data_input[:, :, :, 3:], config.UNSUPERVISED.DATA.FS)
                 BVP = POS_WANG(data_input, config.UNSUPERVISED.DATA.FS)
@@ -94,12 +120,12 @@ def unsupervised_predict(config, data_loader, method_name):
                 raise ValueError("unsupervised method name wrong!")
 
             if config.INFERENCE.EVALUATION_METHOD == "peak detection":
-                gt_hr, pre_hr = calculate_metric_per_video(BVP, labels_input, diff_flag=False,
+                gt_hr, pre_hr, gt_ppg, pre_ppg = calculate_metric_per_video(BVP, labels_input, diff_flag=False,
                                                                 fs=config.UNSUPERVISED.DATA.FS, hr_method='Peak')
                 predict_hr_peak_all.append(pre_hr)
                 gt_hr_peak_all.append(gt_hr)
             if config.INFERENCE.EVALUATION_METHOD == "FFT":
-                gt_fft_hr, pre_fft_hr = calculate_metric_per_video(BVP, labels_input, diff_flag=False,
+                gt_fft_hr, pre_fft_hr, gt_fft_ppg, pre_fft_ppg = calculate_metric_per_video(BVP, labels_input, diff_flag=False,
                                                                    fs=config.UNSUPERVISED.DATA.FS, hr_method='FFT')
                 predict_hr_fft_all.append(pre_fft_hr)
                 gt_hr_fft_all.append(gt_fft_hr)

@@ -156,9 +156,19 @@ if __name__ == "__main__":
             train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TRAIN.DATA.DATASET == "MAUBFC_LARGE_AU":
             train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC_LARGE_AU_PICKED":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TRAIN.DATA.DATASET == "MAUBFC_LARGE_HP":
             train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TRAIN.DATA.DATASET == "MAUBFC_LARGE_HP_PICKED":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC_LARGE_HP_PICKED_2x":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC_LARGE_HP_PICKED_3x":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC_LARGE_HP_PICKED_4x":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "MAUBFC_LARGE_HP_PICKED_5x":
             train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TRAIN.DATA.DATASET == "MAUBFC_MED_HP_PICKED":
             train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
@@ -170,10 +180,16 @@ if __name__ == "__main__":
             train_loader = data_loader.MAPURELoader.MAPURELoader
         elif config.TRAIN.DATA.DATASET == "MAPURE_LARGE_AU":
             train_loader = data_loader.MAPURELoader.MAPURELoader
+        elif config.TRAIN.DATA.DATASET == "MAPURE_LARGE_AU_PICKED":
+            train_loader = data_loader.MAPURELoader.MAPURELoader
         elif config.TRAIN.DATA.DATASET == "MAPURE_LARGE_HP_PICKED":
             train_loader = data_loader.MAPURELoader.MAPURELoader
         elif config.TRAIN.DATA.DATASET == "PURE":
             train_loader = data_loader.PURELoader.PURELoader
+        elif config.TRAIN.DATA.DATASET == "PURE_T1":
+            train_loader = data_loader.PURELoader.PURELoader
+        elif config.TRAIN.DATA.DATASET == "MAPURE_T1":
+            train_loader = data_loader.MAPURELoader.MAPURELoader
         elif config.TRAIN.DATA.DATASET == "SCAMPS":
             train_loader = data_loader.SCAMPSLoader.SCAMPSLoader
         elif config.TRAIN.DATA.DATASET == "MMPD":
@@ -246,6 +262,10 @@ if __name__ == "__main__":
             test_loader = data_loader.UBFCPHYSLoader.UBFCPHYSLoader
         elif config.TEST.DATA.DATASET == "AFRL":
             test_loader = data_loader.AFRLLoader.AFRLLoader
+        elif config.TEST.DATA.DATASET == "MMPD_ST3_SRT_AL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "MMPD_ST3_SRTW_AL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, MMPD, and SCAMPS.")
 
@@ -301,6 +321,12 @@ if __name__ == "__main__":
             test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
         elif config.TEST.DATA.DATASET == "MMPD":
             test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "MMPD_ST3_SRT_AL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "MMPD_ST3_SRTW_AL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "AFRL":
+            test_loader = data_loader.AFRLLoader.AFRLLoader
         ###################################
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, MMPD, and SCAMPS.")
@@ -336,9 +362,13 @@ if __name__ == "__main__":
             unsupervised_loader = data_loader.SCAMPSLoader.SCAMPSLoader
         elif config.UNSUPERVISED.DATA.DATASET == "MMPD":
             unsupervised_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.UNSUPERVISED.DATA.DATASET == "MMPD_ST3_SRT_AL":
+            unsupervised_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.UNSUPERVISED.DATA.DATASET == "MMPD_ST3_SRTW_AL":
+            unsupervised_loader = data_loader.MMPDLoader.MMPDLoader
         elif config.UNSUPERVISED.DATA.DATASET == "AFRL":
-            # unsupervised_loader = data_loader.AFRLRawLoader.AFRLRawLoader
-            unsupervised_loader = data_loader.AFRLLoader.AFRLLoader
+            unsupervised_loader = data_loader.AFRLRawLoader.AFRLRawLoader
+            # unsupervised_loader = data_loader.AFRLLoader.AFRLLoader
         elif config.UNSUPERVISED.DATA.DATASET == "UBFC-PHYS":
             # unsupervised_loader = data_loader.AFRLRawLoader.AFRLRawLoader
             unsupervised_loader = data_loader.UBFCPHYSLoader_V2.UBFCPHYSLoader_V2
