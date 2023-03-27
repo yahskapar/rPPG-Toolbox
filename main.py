@@ -113,6 +113,7 @@ def unsupervised_method_inference(config, data_loader):
 
 
 if __name__ == "__main__":
+    tic = time.perf_counter()
     # parse arguments.
     parser = argparse.ArgumentParser()
     parser = add_args(parser)
@@ -210,6 +211,8 @@ if __name__ == "__main__":
             test_loader = data_loader.SCAMPSLoader.SCAMPSLoader
         elif config.TEST.DATA.DATASET == "MMPD":
             test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "AFRL":
+            test_loader = data_loader.AFRLLoader.AFRLLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, MMPD, and SCAMPS.")
 
@@ -274,3 +277,6 @@ if __name__ == "__main__":
         unsupervised_method_inference(config, data_loader_dict)
     else:
         print("TOOLBOX_MODE only support train_and_test or only_test !", end='\n\n')
+    
+    toc = time.perf_counter()
+    print(f"Completed main.py with PURE_UBFC_TSCAN_BASIC.yaml in {toc - tic:0.4f} seconds")

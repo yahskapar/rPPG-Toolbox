@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 import torch
@@ -41,25 +42,67 @@ def calculate_metrics(predictions, labels, config):
     gt_hr_fft_all = list()
     predict_hr_peak_all = list()
     gt_hr_peak_all = list()
+    result_dict = dict()
+
+    ## Uncomment one of the tasks list below when testing on AFRL
+
+    ## No Motion
+    # tasks = ["T2", "T8"]
+
+    ## Small Motion
+    # tasks = ["T3", "T9"]
+
+    ## Medium Motion
+    # tasks = ["T4", "T10"]
+
+    ## Large Motion
+    # tasks = ["T5", "T11"]
+
+    ## Random Motion
+    # tasks = ["T6", "T12"]
+
+    ## All black bg tasks
+    tasks = ["T1", "T2", "T3", "T4", "T5", "T6"]
+
+    ## All tasks
+    # tasks = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"]
+
     for index in predictions.keys():
+        # For AFRL, first ignore tasks we don't care about
+        if not any(index.endswith(s) for s in tasks):
+            continue
+        print(index)
+
         prediction = _reform_data_from_dict(predictions[index])
         label = _reform_data_from_dict(labels[index])
 
-        if config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Standardized" or \
-                config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Raw":
-            diff_flag_test = False
-        elif config.TEST.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized":
-            diff_flag_test = True
-        else:
-            raise ValueError("Not supported label type in testing!")
-        gt_hr_fft, pred_hr_fft = calculate_metric_per_video(
-            prediction, label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='FFT')
-        gt_hr_peak, pred_hr_peak = calculate_metric_per_video(
-            prediction, label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='Peak')
-        gt_hr_fft_all.append(gt_hr_fft)
-        predict_hr_fft_all.append(pred_hr_fft)
-        predict_hr_peak_all.append(pred_hr_peak)
-        gt_hr_peak_all.append(gt_hr_peak)
+        sampling_rate = config.TEST.DATA.FS     # in FPS
+        sampling_window = 30    # in seconds
+        chunk_size = sampling_window * sampling_rate
+
+        for i in range(0, len(prediction), chunk_size):
+            chunk_pred = prediction[i:i+chunk_size]
+            chunk_label = label[i:i+chunk_size]
+
+            print(f'The pred shape is: {np.shape(chunk_pred)}')
+            print(f'The label shape is: {np.shape(chunk_label)}')
+
+            if config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Standardized" or \
+                    config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Raw":
+                diff_flag_test = False
+            elif config.TEST.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized" or config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Normalized":
+                diff_flag_test = True
+            else:
+                raise ValueError("Not supported label type in testing!")
+            gt_hr_fft, pred_hr_fft = calculate_metric_per_video(
+                chunk_pred, chunk_label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='FFT')
+            gt_hr_peak, pred_hr_peak = calculate_metric_per_video(
+                chunk_pred, chunk_label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='Peak')
+            gt_hr_fft_all.append(gt_hr_fft)
+            predict_hr_fft_all.append(pred_hr_fft)
+            predict_hr_peak_all.append(pred_hr_peak)
+            gt_hr_peak_all.append(gt_hr_peak)
+
     predict_hr_peak_all = np.array(predict_hr_peak_all)
     predict_hr_fft_all = np.array(predict_hr_fft_all)
     gt_hr_peak_all = np.array(gt_hr_peak_all)
@@ -107,3 +150,7 @@ def calculate_metrics(predictions, labels, config):
 
         else:
             raise ValueError("Wrong Test Metric Type")
+
+    # # Save a Bland-Altman Plot of Test Results
+    # sm.graphics.mean_diff_plot(gt_hr_fft_all, predict_hr_fft_all)
+    # plt.pyplot.savefig('bland_altman_plot_T3_MFC_SS_MAUBFC.png')

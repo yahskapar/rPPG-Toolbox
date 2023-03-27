@@ -5,10 +5,10 @@ TEST:
   USE_LAST_EPOCH: True
   DATA:
     FS: 30
-    DATASET: UBFC
+    DATASET: AFRL
     DO_PREPROCESS: False                    # if first time, should be true
     DATA_FORMAT: NDCHW
-    DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/UBFC-rPPG/DATASET_2_backup/DATASET_2/test"                     # Raw dataset path, need to be updated
+    DATA_PATH: "/playpen-nas-ssd/tarbucket/users/xliu0/AFRL"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold/test"    # Processed dataset save path, need to be updated
     EXP_DATA_NAME: ""
     BEGIN: 0.0
@@ -16,12 +16,12 @@ TEST:
     PREPROCESS:
       DATA_TYPE: [ 'DiffNormalized','Standardized' ]
       LABEL_TYPE: DiffNormalized
-      DO_CHUNK: True
+      DO_CHUNK: False
       CHUNK_LENGTH: 180
       DYNAMIC_DETECTION: False
       DYNAMIC_DETECTION_FREQUENCY : 180
-      CROP_FACE: True
-      LARGE_FACE_BOX: True
+      CROP_FACE: False
+      LARGE_FACE_BOX: False
       LARGE_BOX_COEF: 1.5
       H: 72
       W: 72

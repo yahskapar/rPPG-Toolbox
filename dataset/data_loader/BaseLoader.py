@@ -59,6 +59,8 @@ class BaseLoader(Dataset):
         assert (config_data.END < 1 or config_data.END == 1)
         if config_data.DO_PREPROCESS:
             self.preprocess_dataset(self.raw_data_dirs, config_data.PREPROCESS, config_data.BEGIN, config_data.END)
+        elif config_data.DATASET == 'AFRL':
+            self.load_AFRL()
         else:
             if not os.path.exists(self.cached_path):
                 raise ValueError(self.dataset_name,
@@ -341,7 +343,7 @@ class BaseLoader(Dataset):
             count += 1
         return input_path_name_list, label_path_name_list
 
-    def multi_process_manager(self, data_dirs, config_preprocess, multi_process_quota=8):
+    def multi_process_manager(self, data_dirs, config_preprocess, multi_process_quota=3):
         """Allocate dataset preprocessing across multiple processes.
 
         Args:
@@ -463,6 +465,20 @@ class BaseLoader(Dataset):
         self.inputs = inputs
         self.labels = labels
         self.preprocessed_data_len = len(inputs)
+
+    def load_AFRL(self):
+        print(self.cached_path)
+        """Loads the preprocessing data."""
+        inputs = glob.glob(os.path.join(self.cached_path, "*input*.npy"))
+        if inputs == []:
+            raise ValueError(self.name+' dataset loading data error!')
+        inputs = sorted(inputs) # sort input file name list
+        labels = [input.replace("input", "label") for input in inputs]
+        assert (len(inputs) == len(labels))
+        self.inputs = inputs
+        self.labels = labels
+        self.preprocessed_data_len = len(inputs)
+        print("loaded data len:", self.preprocessed_data_len)
 
     @staticmethod
     def diff_normalize_data(data):
