@@ -140,7 +140,9 @@ class MMPDLoader(BaseLoader):
         motion = np.array(mat['motion'])
         light = np.array(mat['light'])
 
-        if np.any(skin_color == 3) and np.any(np.isin(motion, ['Stationary', 'Rotation', 'Talking', 'Walking'])) and np.any(np.isin(light, ['LED-low', 'LED-high', 'Incandescent'])):
+        # if np.any(skin_color == 3) and np.any(np.isin(motion, ['Stationary', 'Rotation', 'Talking', 'Walking'])) and np.any(np.isin(light, ['LED-low', 'LED-high', 'Incandescent'])):
+        if np.any(skin_color == 6) and np.any(np.isin(motion, ['Stationary'])) and np.any(np.isin(light, ['Nature'])):
+        # if np.any(np.isin(motion, ['Stationary'])) and np.any(np.isin(light, ['Nature'])):
             pass
         else:
             accept_file=False

@@ -136,6 +136,16 @@ if __name__ == "__main__":
             train_loader = data_loader.UBFCLoader.UBFCLoader
         elif config.TRAIN.DATA.DATASET == "MAUBFC":
             train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "LAUBFC":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "PRSTUBFC":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "PRST-UBFC-Random":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "PRST-UBFC-DST-86":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "PRST-UBFC-DST-86-Mixed":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TRAIN.DATA.DATASET == "MAUBFC_CDVS_LOW_HP":
             train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TRAIN.DATA.DATASET == "MAUBFC_CDVS_HIGH_HP":
@@ -223,6 +233,10 @@ if __name__ == "__main__":
             valid_loader = data_loader.SCAMPSLoader.SCAMPSLoader
         elif config.VALID.DATA.DATASET == "MMPD":
             valid_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.VALID.DATA.DATASET == "PRST-UBFC-DST-86":
+            valid_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.VALID.DATA.DATASET == "MMPD_ST5_S_NL":
+            valid_loader = data_loader.MMPDLoader.MMPDLoader
         elif config.VALID.DATA.DATASET == "MAPURE_RANDOM_NORMAL":
             valid_loader = data_loader.MAPURELoader.MAPURELoader
         elif config.VALID.DATA.DATASET == "MAPURE_LARGE_HP":
@@ -266,6 +280,24 @@ if __name__ == "__main__":
             test_loader = data_loader.MMPDLoader.MMPDLoader
         elif config.TEST.DATA.DATASET == "MMPD_ST3_SRTW_AL":
             test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "MMPD_ST3_S_NL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "MMPD_ST4_S_NL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "MMPD_ST5_S_NL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "MMPD_ST6_S_NL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "MMPD_S_NL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "LAUBFC":
+            test_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TEST.DATA.DATASET == "PRSTUBFC":
+            test_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TEST.DATA.DATASET == "PRST-UBFC-Random":
+            test_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TEST.DATA.DATASET == "PRST-UBFC-DST-86":
+            test_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, MMPD, and SCAMPS.")
 
@@ -325,6 +357,24 @@ if __name__ == "__main__":
             test_loader = data_loader.MMPDLoader.MMPDLoader
         elif config.TEST.DATA.DATASET == "MMPD_ST3_SRTW_AL":
             test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "MMPD_ST3_S_NL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "MMPD_ST4_S_NL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "MMPD_ST5_S_NL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "MMPD_ST6_S_NL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "MMPD_S_NL":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TEST.DATA.DATASET == "LAUBFC":
+            test_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TEST.DATA.DATASET == "PRSTUBFC":
+            test_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TEST.DATA.DATASET == "PRST-UBFC-Random":
+            test_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TEST.DATA.DATASET == "PRST-UBFC-DST-86":
+            test_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TEST.DATA.DATASET == "AFRL":
             test_loader = data_loader.AFRLLoader.AFRLLoader
         ###################################

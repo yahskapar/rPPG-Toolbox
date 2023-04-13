@@ -71,14 +71,35 @@ class MAUBFCLoader(BaseLoader):
 
         # print(glob.glob(os.path.join(data_dirs[i]['path'],'*.npy')))
 
-        frames = self.read_video(
-            glob.glob(os.path.join(data_dirs[i]['path'],'*.npy')))
+        if glob.glob(os.path.join(data_dirs[i]['path'],'*.npy')):
+            frames = self.read_video(glob.glob(os.path.join(data_dirs[i]['path'],'*.npy')))
+        elif glob.glob(os.path.join(data_dirs[i]['path'],'*.avi')):
+            frames = self.read_video_v2(glob.glob(os.path.join(data_dirs[i]['path'],'*.avi')))
+        else:
+            raise ValueError(f"Unsupported file type: {file_extension}")
+
+        # frames = self.read_video(
+        #     glob.glob(os.path.join(data_dirs[i]['path'],'*.npy')))
         bvps = self.read_wave(
             os.path.join(data_dirs[i]['path'],"ground_truth.txt"))
             
         frames_clips, bvps_clips = self.preprocess(frames, bvps, config_preprocess)
         input_name_list, label_name_list = self.save_multi_process(frames_clips, bvps_clips, saved_filename)
         file_list_dict[i] = input_name_list
+
+    @staticmethod
+    def read_video_v2(video_file):
+        """Reads a video file, returns frames(T, H, W, 3) """
+        VidObj = cv2.VideoCapture(video_file[0])
+        VidObj.set(cv2.CAP_PROP_POS_MSEC, 0)
+        success, frame = VidObj.read()
+        frames = list()
+        while success:
+            frame = cv2.cvtColor(np.array(frame), cv2.COLOR_BGR2RGB)
+            frame = np.asarray(frame)
+            frames.append(frame)
+            success, frame = VidObj.read()
+        return np.asarray(frames)
 
     @staticmethod
     def read_video(video_file):

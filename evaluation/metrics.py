@@ -108,7 +108,7 @@ def calculate_metrics(predictions, labels, config):
         # exit()
 
         # For MMPD
-        # print(index)
+        print(index)
 
         # For AFRL, first ignore tasks we don't care about
         # if not any(index.endswith(s) for s in tasks):
@@ -120,18 +120,18 @@ def calculate_metrics(predictions, labels, config):
         #     continue
 
         # For PURE
-        subject_id = index[:-2]
-        print(subject_id)
-        task_number = index[-2::]
-        # if task_number != "02":
-        #     continue    # We only want to evaluate videos related to the speech task
-        if subject_id == "1" or subject_id == "2" or subject_id == "3" or subject_id == "4" or subject_id == "5" or subject_id == "6":
-            print('Skipped subject!')
-            continue
-        elif task_number != "04" or task_number != "06":     # Skip all tasks but T2
-            print('Skipped task!')
-            print(task_number)
-            continue    #
+        # subject_id = index[:-2]
+        # print(subject_id)
+        # task_number = index[-2::]
+        # # if task_number != "02":
+        # #     continue    # We only want to evaluate videos related to the speech task
+        # if subject_id == "1" or subject_id == "2" or subject_id == "3" or subject_id == "4" or subject_id == "5" or subject_id == "6":
+        #     print('Skipped subject!')
+        #     continue
+        # elif task_number != "04" or task_number != "06":     # Skip all tasks but T2
+        #     print('Skipped task!')
+        #     print(task_number)
+        #     continue    #
 
         # print(video_predictions[index])
         # print(video_labels[index])
@@ -193,18 +193,17 @@ def calculate_metrics(predictions, labels, config):
         #     temp_predict_hr_peak_all.append(pred_hr_peak)
         #     temp_gt_hr_peak_all.append(gt_hr_peak)
 
-    #     # Store into dict for PCA/t-SNE plots
-    #     # This is broken, FIX TODO!!!
-    #     result_dict[index] = {
-    #         "gt_hr_fft": np.mean(temp_gt_hr_fft_all),
-    #         "pred_hr_fft": np.mean(temp_predict_hr_fft_all),
-    #         "label_ppg": label_ppg,
-    #         "pred_ppg": pred_ppg
-    #     }
+        # Store into dict for PCA/t-SNE plots
+        result_dict[index] = {
+            "gt_hr_fft": gt_hr_fft_all,
+            "pred_hr_fft": predict_hr_fft_all,
+            "label_ppg": label_ppg,
+            "pred_ppg": pred_ppg
+        }
 
-    # filename = config.TRAIN.MODEL_FILE_NAME + "_result.npy"
+    filename = config.TRAIN.MODEL_FILE_NAME + "_result.npy"
     # file_path = os.path.join("/playpen-nas-ssd/akshay/UNC_Google_Physio/rPPG-Toolbox/dicts_for_paper", filename)
-    # np.save(file_path, result_dict)
+    np.save('PRST_Random_dict.npy', result_dict)
 
     predict_hr_peak_all = np.array(predict_hr_peak_all)
     predict_hr_fft_all = np.array(predict_hr_fft_all)
