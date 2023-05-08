@@ -1,16 +1,16 @@
 BASE: ['']
-TOOLBOX_MODE: "train_and_test"      # "train_and_test"  or "only_test"
+TOOLBOX_MODE: "only_test"      # "train_and_test"  or "only_test"
 TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 30
   LR: 9e-3
-  MODEL_FILE_NAME: MAPURE_T1_PURE_T2-T6_tscan
+  MODEL_FILE_NAME: NLUT_UBFC_50_50_DST_tscan
   DATA:
     FS: 30
-    DATASET: MAPURE_T1
-    DO_PREPROCESS: True               # if first time, should be true
+    DATASET: NLUT_UBFC_50_50_DST
+    DO_PREPROCESS: False              # if first time, should be true
     DATA_FORMAT: NDCHW
-    DATA_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/datasets/MAPURE_LARGE_AU_PICKED/use"                     # Raw dataset path, need to be updated
+    DATA_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/datasets/NLUT_UBFC_50_50_DST"                     # Raw dataset path, need to be updated
     # DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/PURE/RawData/test/use"
     CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold/train"    # Processed dataset save path, need to be updated
     EXP_DATA_NAME: ""
@@ -85,7 +85,7 @@ TRAIN:
 VALID:
   DATA:
     FS: 30
-    DATASET: MAPURE_LARGE_HP_PICKED
+    DATASET: UBFC
     DO_PREPROCESS: False                  # if first time, should be true
     DATA_FORMAT: NDCHW
     DATA_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/datasets/MAPURE_LARGE_HP_PICKED"                     # Raw dataset path, need to be updated
@@ -105,31 +105,31 @@ VALID:
       LARGE_BOX_COEF: 1.5
       H: 72
       W: 72
-TEST:
-  METRICS: ['MAE','RMSE','MAPE','Pearson']
-  USE_LAST_EPOCH: True                     # to use provided validation dataset to find the best epoch, should be false
-  DATA:
-    FS: 30
-    DATASET: PURE
-    DO_PREPROCESS: False                    # if first time, should be true
-    DATA_FORMAT: NDCHW
-    DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/PURE/RawData/test"                     # Raw dataset path, need to be updated
-    CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold"    # Processed dataset save path, need to be updated
-    EXP_DATA_NAME: ""
-    BEGIN: 0.0
-    END: 1.0
-    PREPROCESS:
-      DATA_TYPE: [ 'DiffNormalized','Standardized' ]
-      LABEL_TYPE: DiffNormalized
-      DO_CHUNK: True
-      CHUNK_LENGTH: 180
-      DYNAMIC_DETECTION: False
-      DYNAMIC_DETECTION_FREQUENCY : 180
-      CROP_FACE: True
-      LARGE_FACE_BOX: True
-      LARGE_BOX_COEF: 1.5
-      H: 72
-      W: 72
+# TEST:
+#   METRICS: ['MAE','RMSE','MAPE','Pearson']
+#   USE_LAST_EPOCH: True                     # to use provided validation dataset to find the best epoch, should be false
+#   DATA:
+#     FS: 30
+#     DATASET: PURE
+#     DO_PREPROCESS: False                    # if first time, should be true
+#     DATA_FORMAT: NDCHW
+#     DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/PURE/RawData/test"                     # Raw dataset path, need to be updated
+#     CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold"    # Processed dataset save path, need to be updated
+#     EXP_DATA_NAME: ""
+#     BEGIN: 0.0
+#     END: 1.0
+#     PREPROCESS:
+#       DATA_TYPE: [ 'DiffNormalized','Standardized' ]
+#       LABEL_TYPE: DiffNormalized
+#       DO_CHUNK: True
+#       CHUNK_LENGTH: 180
+#       DYNAMIC_DETECTION: False
+#       DYNAMIC_DETECTION_FREQUENCY : 180
+#       CROP_FACE: True
+#       LARGE_FACE_BOX: True
+#       LARGE_BOX_COEF: 1.5
+#       H: 72
+#       W: 72
 # TEST:
 #   METRICS: ['MAE','RMSE','MAPE','Pearson']
 #   USE_LAST_EPOCH: True                     # to use provided validation dataset to find the best epoch, should be false
@@ -155,31 +155,31 @@ TEST:
 #       LARGE_BOX_COEF: 1.5
 #       H: 72
 #       W: 72
-# TEST:
-#   METRICS: ['MAE','RMSE','MAPE','Pearson']
-#   USE_LAST_EPOCH: True                     # to use provided validation dataset to find the best epoch, should be false
-#   DATA:
-#     FS: 30
-#     DATASET: AFRL
-#     DO_PREPROCESS: False                    # if first time, should be true
-#     DATA_FORMAT: NDCHW
-#     DATA_PATH: "/playpen-nas-ssd/tarbucket/users/xliu0/AFRL"                     # Raw dataset path, need to be updated
-#     CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold/test"    # Processed dataset save path, need to be updated
-#     EXP_DATA_NAME: ""
-#     BEGIN: 0.0
-#     END: 1.0
-#     PREPROCESS:
-#       DATA_TYPE: [ 'DiffNormalized','Standardized' ]
-#       LABEL_TYPE: DiffNormalized
-#       DO_CHUNK: False
-#       CHUNK_LENGTH: 180
-#       DYNAMIC_DETECTION: False
-#       DYNAMIC_DETECTION_FREQUENCY : 180
-#       CROP_FACE: False
-#       LARGE_FACE_BOX: False
-#       LARGE_BOX_COEF: 1.5
-#       H: 72
-#       W: 72
+TEST:
+  METRICS: ['MAE','RMSE','MAPE','Pearson']
+  USE_LAST_EPOCH: True                     # to use provided validation dataset to find the best epoch, should be false
+  DATA:
+    FS: 30
+    DATASET: AFRL
+    DO_PREPROCESS: False                    # if first time, should be true
+    DATA_FORMAT: NDCHW
+    DATA_PATH: "/playpen-nas-ssd/tarbucket/users/xliu0/AFRL"                     # Raw dataset path, need to be updated
+    CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold/test"    # Processed dataset save path, need to be updated
+    EXP_DATA_NAME: ""
+    BEGIN: 0.0
+    END: 1.0
+    PREPROCESS:
+      DATA_TYPE: [ 'DiffNormalized','Standardized' ]
+      LABEL_TYPE: DiffNormalized
+      DO_CHUNK: False
+      CHUNK_LENGTH: 180
+      DYNAMIC_DETECTION: False
+      DYNAMIC_DETECTION_FREQUENCY : 180
+      CROP_FACE: False
+      LARGE_FACE_BOX: False
+      LARGE_BOX_COEF: 1.5
+      H: 72
+      W: 72
 # TEST:
 #   METRICS: ['MAE','RMSE','MAPE','Pearson']
 #   USE_LAST_EPOCH: True
@@ -210,7 +210,7 @@ TEST:
 #   USE_LAST_EPOCH: True                      # to use provided validation dataset to find the best epoch, should be false
 #   DATA:
 #     FS: 30
-#     DATASET: MMPD_ST3_SRTW_AL
+#     DATASET: MMPD_ST6_S_NL
 #     DO_PREPROCESS: False                    # if first time, should be true
 #     DATA_FORMAT: NDCHW
 #     DATA_PATH:   "/playpen-nas-ssd/akshay/UNC_Google_Physio/datasets/Mini-MMPD-rPPG"          # Raw dataset path, need to be updated
@@ -242,5 +242,5 @@ MODEL:
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
-  MODEL_PATH: ""
+  MODEL_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/models/gold/MAUBFC_CDVS_HIGH_HP.pth"
   # MODEL_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/models/gold/MAPURE_LARGE_AU.pth" # /playpen-nas-ssd/akshay/UNC_Google_Physio/models/gold/MAUBFC_LARGE_HP_PICKED.pth

@@ -69,7 +69,7 @@ def calculate_metrics(predictions, labels, config):
 
     # Small Motion
     # tasks = ["T3", "T9"]
-    # tasks = ["T3"]
+    tasks = ["T3"]
 
     # Medium Motion
     # tasks = ["T4", "T10"]
@@ -108,12 +108,12 @@ def calculate_metrics(predictions, labels, config):
         # exit()
 
         # For MMPD
-        print(index)
+        # print(index)
 
         # For AFRL, first ignore tasks we don't care about
-        # if not any(index.endswith(s) for s in tasks):
-        #     continue
-        # print(index)
+        if not any(index.endswith(s) for s in tasks):
+            continue
+        print(index)
 
         # For UBFC-PHYS filtering
         # if index in subselect_out:
@@ -141,57 +141,57 @@ def calculate_metrics(predictions, labels, config):
         prediction = _reform_data_from_dict(predictions[index])
         label = _reform_data_from_dict(labels[index])
 
-        if config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Standardized" or \
-                config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Raw":
-            diff_flag_test = False
-        elif config.TEST.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized" or config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Normalized":
-            diff_flag_test = True
-        else:
-            raise ValueError("Not supported label type in testing!")
-        gt_hr_fft, pred_hr_fft, label_ppg, pred_ppg = calculate_metric_per_video(
-            prediction, label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='FFT')
-        gt_hr_peak, pred_hr_peak, label_ppg_peak, pred_ppg_peak = calculate_metric_per_video(
-            prediction, label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='Peak')
-        gt_hr_fft_all.append(gt_hr_fft)
-        predict_hr_fft_all.append(pred_hr_fft)
-        predict_hr_peak_all.append(pred_hr_peak)
-        gt_hr_peak_all.append(gt_hr_peak)
+        # if config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Standardized" or \
+        #         config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Raw":
+        #     diff_flag_test = False
+        # elif config.TEST.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized" or config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Normalized":
+        #     diff_flag_test = True
+        # else:
+        #     raise ValueError("Not supported label type in testing!")
+        # gt_hr_fft, pred_hr_fft, label_ppg, pred_ppg = calculate_metric_per_video(
+        #     prediction, label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='FFT')
+        # gt_hr_peak, pred_hr_peak, label_ppg_peak, pred_ppg_peak = calculate_metric_per_video(
+        #     prediction, label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='Peak')
+        # gt_hr_fft_all.append(gt_hr_fft)
+        # predict_hr_fft_all.append(pred_hr_fft)
+        # predict_hr_peak_all.append(pred_hr_peak)
+        # gt_hr_peak_all.append(gt_hr_peak)
 
-        # sampling_rate = config.TEST.DATA.FS     # in seconds
-        # sampling_window = 30    # in seconds
-        # chunk_size = sampling_window * sampling_rate
+        sampling_rate = config.TEST.DATA.FS     # in seconds
+        sampling_window = 30    # in seconds
+        chunk_size = sampling_window * sampling_rate
 
-        # temp_predict_hr_fft_all = list()
-        # temp_gt_hr_fft_all = list()
-        # temp_predict_hr_peak_all = list()
-        # temp_gt_hr_peak_all = list()
+        temp_predict_hr_fft_all = list()
+        temp_gt_hr_fft_all = list()
+        temp_predict_hr_peak_all = list()
+        temp_gt_hr_peak_all = list()
 
-        # for i in range(0, len(prediction), chunk_size):
-        #     chunk_pred = prediction[i:i+chunk_size]
-        #     chunk_label = label[i:i+chunk_size]
+        for i in range(0, len(prediction), chunk_size):
+            chunk_pred = prediction[i:i+chunk_size]
+            chunk_label = label[i:i+chunk_size]
 
-        #     print(f'The pred shape is: {np.shape(chunk_pred)}')
-        #     print(f'The label shape is: {np.shape(chunk_label)}')
+            print(f'The pred shape is: {np.shape(chunk_pred)}')
+            print(f'The label shape is: {np.shape(chunk_label)}')
 
-        #     if config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Standardized" or \
-        #             config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Raw":
-        #         diff_flag_test = False
-        #     elif config.TEST.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized" or config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Normalized":
-        #         diff_flag_test = True
-        #     else:
-        #         raise ValueError("Not supported label type in testing!")
-        #     gt_hr_fft, pred_hr_fft, label_ppg, pred_ppg = calculate_metric_per_video(
-        #         chunk_pred, chunk_label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='FFT')
-        #     gt_hr_peak, pred_hr_peak, label_ppg_peak, pred_ppg_peak = calculate_metric_per_video(
-        #         chunk_pred, chunk_label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='Peak')
-        #     gt_hr_fft_all.append(gt_hr_fft)
-        #     predict_hr_fft_all.append(pred_hr_fft)
-        #     predict_hr_peak_all.append(pred_hr_peak)
-        #     gt_hr_peak_all.append(gt_hr_peak)
-        #     temp_gt_hr_fft_all.append(gt_hr_fft)
-        #     temp_predict_hr_fft_all.append(pred_hr_fft)
-        #     temp_predict_hr_peak_all.append(pred_hr_peak)
-        #     temp_gt_hr_peak_all.append(gt_hr_peak)
+            if config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Standardized" or \
+                    config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Raw":
+                diff_flag_test = False
+            elif config.TEST.DATA.PREPROCESS.LABEL_TYPE == "DiffNormalized" or config.TEST.DATA.PREPROCESS.LABEL_TYPE == "Normalized":
+                diff_flag_test = True
+            else:
+                raise ValueError("Not supported label type in testing!")
+            gt_hr_fft, pred_hr_fft, label_ppg, pred_ppg = calculate_metric_per_video(
+                chunk_pred, chunk_label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='FFT')
+            gt_hr_peak, pred_hr_peak, label_ppg_peak, pred_ppg_peak = calculate_metric_per_video(
+                chunk_pred, chunk_label, diff_flag=diff_flag_test, fs=config.TEST.DATA.FS, hr_method='Peak')
+            gt_hr_fft_all.append(gt_hr_fft)
+            predict_hr_fft_all.append(pred_hr_fft)
+            predict_hr_peak_all.append(pred_hr_peak)
+            gt_hr_peak_all.append(gt_hr_peak)
+            temp_gt_hr_fft_all.append(gt_hr_fft)
+            temp_predict_hr_fft_all.append(pred_hr_fft)
+            temp_predict_hr_peak_all.append(pred_hr_peak)
+            temp_gt_hr_peak_all.append(gt_hr_peak)
 
         # Store into dict for PCA/t-SNE plots
         result_dict[index] = {
@@ -212,8 +212,12 @@ def calculate_metrics(predictions, labels, config):
     for metric in config.TEST.METRICS:
         if metric == "MAE":
             if config.INFERENCE.EVALUATION_METHOD == "FFT":
+                n = len(predict_hr_fft_all)
                 MAE_FFT = np.mean(np.abs(predict_hr_fft_all - gt_hr_fft_all))
-                print("FFT MAE (FFT Label):{0}".format(MAE_FFT))
+                s = np.std(np.abs(predict_hr_fft_all - gt_hr_fft_all), ddof=1)  # sample standard deviation
+                standard_error = s / np.sqrt(n)
+                print("Standard Deviation is: {0}".format(s))
+                print("FFT MAE (FFT Label): {0} +/- {1}".format(MAE_FFT, standard_error))
             elif config.INFERENCE.EVALUATION_METHOD == "peak detection":
                 MAE_PEAK = np.mean(np.abs(predict_hr_peak_all - gt_hr_peak_all))
                 print("Peak MAE (Peak Label):{0}".format(MAE_PEAK))
