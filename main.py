@@ -138,6 +138,22 @@ if __name__ == "__main__":
             train_loader = data_loader.MMPDLoader.MMPDLoader
         elif config.TRAIN.DATA.DATASET == "BP4DPlus":
             train_loader = data_loader.BP4DPlusLoader.BP4DPlusLoader
+        elif config.TRAIN.DATA.DATASET == "MMPD_ST3_Aug_ST56":
+            train_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3":
+            train_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56":
+            train_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56_V2":
+            train_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56_V3":
+            train_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TRAIN.DATA.DATASET == "NLUT_UBFC_DST_FP_SEG":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "NLUT_UBFC_ST6_FP_SEG":
+            train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
+        elif config.TRAIN.DATA.DATASET == "NLUT_PURE_ST3_FP_SEG":
+            train_loader = data_loader.MAPURELoader.MAPURELoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, MMPD, and SCAMPS.")
 
@@ -206,6 +222,8 @@ if __name__ == "__main__":
             test_loader = data_loader.MMPDLoader.MMPDLoader
         elif config.TEST.DATA.DATASET == "BP4DPlus":
             test_loader = data_loader.BP4DPlusLoader.BP4DPlusLoader
+        elif config.TEST.DATA.DATASET == "MMPD_ST3_Aug_ST56":
+            test_loader = data_loader.MMPDLoader.MMPDLoader
         else:
             raise ValueError("Unsupported dataset! Currently supporting UBFC, PURE, MMPD, and SCAMPS.")
 

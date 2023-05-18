@@ -158,7 +158,9 @@ class MMPDLoader(BaseLoader):
         inputs = []
         for each_input in inputs_temp:
             info = each_input.split(os.sep)[-1].split('_')
+            # print(info)
             light = int(info[1][-1])
+            # print(light, self.info.LIGHT)
             motion = int(info[2][-1])
             exercise = int(info[3][-1])
             skin_color = int(info[4][-1])
