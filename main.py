@@ -148,6 +148,10 @@ if __name__ == "__main__":
             train_loader = data_loader.MMPDLoader.MMPDLoader
         elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56_V3":
             train_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56_NO_SEG":
+            train_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56_TVT40":
+            train_loader = data_loader.MMPDLoader.MMPDLoader
         elif config.TRAIN.DATA.DATASET == "NLUT_UBFC_DST_FP_SEG":
             train_loader = data_loader.MAUBFCLoader.MAUBFCLoader
         elif config.TRAIN.DATA.DATASET == "NLUT_UBFC_ST6_FP_SEG":

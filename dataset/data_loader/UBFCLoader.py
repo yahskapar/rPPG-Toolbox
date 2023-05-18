@@ -70,7 +70,7 @@ class UBFCLoader(BaseLoader):
         saved_filename = data_dirs[i]['index']
 
         frames = self.read_video(
-            os.path.join(data_dirs[i]['path'],"vid.avi"))
+            glob.glob(os.path.join(data_dirs[i]['path'],'*.avi'))[0])
         bvps = self.read_wave(
             os.path.join(data_dirs[i]['path'],"ground_truth.txt"))
             
