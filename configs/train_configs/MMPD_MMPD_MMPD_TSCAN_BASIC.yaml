@@ -17,7 +17,7 @@ TRAIN:
       MAKEUP: [1, 2] # 1 - True, 2 - False
     FS: 30
     DATASET: MMPD_Full_ST3_Aug_ST56_TVT40
-    DO_PREPROCESS: True                 # if first time, should be true
+    DO_PREPROCESS: False                 # if first time, should be true
     DATA_FORMAT: NDCHW
     DATA_PATH:   "/playpen-nas-ssd/akshay/UNC_Google_Physio/datasets/TVT_MMPD_FULL_ST6_FP_SEG"          # Raw dataset path, need to be updated
     CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold/train"      # Processed dataset save path, need to be updated
@@ -98,7 +98,7 @@ TEST:
   USE_LAST_EPOCH: True                      # to use provided validation dataset to find the best epoch, should be false
   DATA:
     INFO:
-      LIGHT: [1]  # 1 - LED-Low, 2 - LED-high, 3 - Incandescent, 4 - Nature
+      LIGHT: [1, 4]  # 1 - LED-Low, 2 - LED-high, 3 - Incandescent, 4 - Nature
       MOTION: [1] # 1 - Stationary, 2 - Rotation, 3 - Talking, 4 - Walking
       EXERCISE: [2] # 1 - True, 2 - False
       SKIN_COLOR: [6] # Fitzpatrick Scale Skin Types - 3, 4, 5, 6
@@ -110,7 +110,7 @@ TEST:
     DATASET: MMPD
     DO_PREPROCESS: False                  # if first time, should be true
     DATA_FORMAT: NDCHW
-    DATA_PATH:   "/playpen-nas-ssd/akshay/UNC_Google_Physio/datasets/MMPD_Full_Res_0"          # Raw dataset path, need to be updated
+    DATA_PATH:   "/playpen-nas-ssd/akshay/UNC_Google_Physio/datasets/MMPD-rPPG"          # Raw dataset path, need to be updated
     CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold/test"      # Processed dataset save path, need to be updated
     EXP_DATA_NAME: ""
     BEGIN: 0.0
@@ -139,11 +139,13 @@ MODEL:
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
-  MODEL_PATH: "PreTrainedModels/MMPD_Full_ST3_Aug_ST56_TVT40_SizeW72_SizeH72_ClipLength180_DataTypeDiffNormalized_Standardized_LabelTypeDiffNormalized_Large_boxTrue_Large_size1.5_Dyamic_DetFalse_det_len180/MMPD_Full_ST3_Aug_ST56_TVT40_MMPD_tscan_Epoch29.pth"
+  # MODEL_PATH: "PreTrainedModels/MMPD_Full_ST3_Aug_ST56_TVT40_SizeW72_SizeH72_ClipLength180_DataTypeDiffNormalized_Standardized_LabelTypeDiffNormalized_Large_boxTrue_Large_size1.5_Dyamic_DetFalse_det_len180/MMPD_Full_ST3_Aug_ST56_TVT40_MMPD_tscan_Epoch29.pth"
+  # Shows some promise
   # MODEL_PATH: "PreTrainedModels/MMPD_Full_ST3_Aug_ST56_NO_SEG_SizeW72_SizeH72_ClipLength180_DataTypeDiffNormalized_Standardized_LabelTypeDiffNormalized_Large_boxTrue_Large_size1.5_Dyamic_DetFalse_det_len180/MMPD_Full_ST3_Aug_ST56_NO_SEG_MMPD_tscan_Epoch29.pth"
   # MODEL_PATH:     "PreTrainedModels/MMPD_Full_ST3_Aug_ST56_V3_SizeW72_SizeH72_ClipLength180_DataTypeDiffNormalized_Standardized_LabelTypeDiffNormalized_Large_boxTrue_Large_size1.5_Dyamic_DetFalse_det_len180/MMPD_Full_ST3_Aug_ST56_V3_MMPD_tscan_Epoch29.pth"
   # MODEL_PATH:    "PreTrainedModels/MMPD_Full_ST3_Aug_ST56_V2_SizeW72_SizeH72_ClipLength180_DataTypeDiffNormalized_Standardized_LabelTypeDiffNormalized_Large_boxTrue_Large_size1.5_Dyamic_DetFalse_det_len180/MMPD_Full_ST3_Aug_ST56_V2_MMPD_tscan_Epoch29.pth"
   # MODEL_PATH:   "PreTrainedModels/MMPD_SizeW72_SizeH72_ClipLength180_DataTypeDiffNormalized_Standardized_LabelTypeDiffNormalized_Large_boxTrue_Large_size1.5_Dyamic_DetFalse_det_len180/MMPD_Full_ST3_MMPD_tscan_Epoch29.pth"
+  # Shows some promise
   # MODEL_PATH:   "PreTrainedModels/MMPD_Full_ST3_Aug_ST56_SizeW72_SizeH72_ClipLength180_DataTypeDiffNormalized_Standardized_LabelTypeDiffNormalized_Large_boxTrue_Large_size1.5_Dyamic_DetFalse_det_len180/MMPD_Full_ST3_Aug_ST56_MMPD_tscan_Epoch29.pth"
   # MODEL_PATH:   "PreTrainedModels/MMPD_ST3_Aug_ST56_SizeW72_SizeH72_ClipLength180_DataTypeDiffNormalized_Standardized_LabelTypeDiffNormalized_Large_boxTrue_Large_size1.5_Dyamic_DetFalse_det_len180/MMPD_MMPD_tscan_Epoch29.pth"
   # MODEL_PATH:   "PreTrainedModels/MMPD_SizeW72_SizeH72_ClipLength180_DataTypeDiffNormalized_Standardized_LabelTypeDiffNormalized_Large_boxTrue_Large_size1.5_Dyamic_DetFalse_det_len180/MMPD_ST3_MMPD_tscan_Epoch29.pth"
