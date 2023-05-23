@@ -144,9 +144,19 @@ if __name__ == "__main__":
             train_loader = data_loader.MMPDLoader.MMPDLoader
         elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56":
             train_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56_RVM":
+            train_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56_Combined":
+            train_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56_RVM_Combined":
+            train_loader = data_loader.MMPDLoader.MMPDLoader
         elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56_V2":
             train_loader = data_loader.MMPDLoader.MMPDLoader
         elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56_V3":
+            train_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56_V4":
+            train_loader = data_loader.MMPDLoader.MMPDLoader
+        elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56_V4_Combined":
             train_loader = data_loader.MMPDLoader.MMPDLoader
         elif config.TRAIN.DATA.DATASET == "MMPD_Full_ST3_Aug_ST56_NO_SEG":
             train_loader = data_loader.MMPDLoader.MMPDLoader

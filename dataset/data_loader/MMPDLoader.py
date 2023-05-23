@@ -61,10 +61,12 @@ class MMPDLoader(BaseLoader):
             raise ValueError(self.dataset_name + ' data paths empty!')
         dirs = list()
         for data_dir in data_dirs:
+            # print(data_dir)
             subject = int(os.path.split(data_dir)[-1][7:])
             mat_dirs = os.listdir(data_dir)
             for mat_dir in mat_dirs:
                 index = mat_dir.split('_')[-1].split('.')[0]
+                # print(index)
                 dirs.append({'index': index, 
                              'path': data_dir+os.sep+mat_dir,
                              'subject': subject})
@@ -111,8 +113,9 @@ class MMPDLoader(BaseLoader):
         frames, bvps, light, motion, exercise, skin_color, gender, glasser, hair_cover, makeup \
             = self.read_mat(data_dirs[i]['path'])
 
-        saved_filename = 'subject' + str(data_dirs[i]['subject'])
+        saved_filename = 'subject' + str(data_dirs[i]['subject']) + '_' + str(data_dirs[i]['index'])
         saved_filename += f'_L{light}_MO{motion}_E{exercise}_S{skin_color}_GE{gender}_GL{glasser}_H{hair_cover}_MA{makeup}'
+        print(saved_filename)
 
         frames = (np.round(frames * 255)).astype(np.uint8)
         target_length = frames.shape[0]
@@ -157,17 +160,29 @@ class MMPDLoader(BaseLoader):
         inputs_temp = file_list_df['input_files'].tolist()
         inputs = []
         for each_input in inputs_temp:
+            # print(each_input)
             info = each_input.split(os.sep)[-1].split('_')
-            # print(info)
-            light = int(info[1][-1])
-            # print(light, self.info.LIGHT)
-            motion = int(info[2][-1])
-            exercise = int(info[3][-1])
-            skin_color = int(info[4][-1])
-            gender = int(info[5][-1])
-            glasser = int(info[6][-1])
-            hair_cover = int(info[7][-1])
-            makeup = int(info[8][-1])
+            # print(len(info))
+            if len(info) == 10:
+                light = int(info[1][-1])
+                # print(light, self.info.LIGHT)
+                motion = int(info[2][-1])
+                exercise = int(info[3][-1])
+                skin_color = int(info[4][-1])
+                gender = int(info[5][-1])
+                glasser = int(info[6][-1])
+                hair_cover = int(info[7][-1])
+                makeup = int(info[8][-1])
+            elif len(info) == 11:
+                light = int(info[2][-1])
+                # print(light, self.info.LIGHT)
+                motion = int(info[3][-1])
+                exercise = int(info[4][-1])
+                skin_color = int(info[5][-1])
+                gender = int(info[6][-1])
+                glasser = int(info[7][-1])
+                hair_cover = int(info[8][-1])
+                makeup = int(info[9][-1])
             if (light in self.info.LIGHT) and (motion in self.info.MOTION) and \
                 (exercise in self.info.EXERCISE) and (skin_color in self.info.SKIN_COLOR) and \
                 (gender in self.info.GENDER) and (glasser in self.info.GLASSER) and \
