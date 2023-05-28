@@ -7,7 +7,9 @@ import torch
 import torch.optim as optim
 from evaluation.metrics import calculate_metrics
 from neural_methods.loss.PhysNetNegPearsonLoss import Neg_Pearson
+from neural_methods.loss.NPSNRLoss import NPSNR
 from neural_methods.model.PhysNet import PhysNet_padding_Encoder_Decoder_MAX
+from neural_methods.model.RtPPG import N3DED128, N3DED64, N3DED32, N3DED16, N3DED8
 from neural_methods.trainer.BaseTrainer import BaseTrainer
 from torch.autograd import Variable
 from tqdm import tqdm
@@ -29,12 +31,17 @@ class PhysnetTrainer(BaseTrainer):
         self.min_valid_loss = None
         self.best_epoch = 0
 
-        self.model = PhysNet_padding_Encoder_Decoder_MAX(
+        # self.model = PhysNet_padding_Encoder_Decoder_MAX(
+        #     frames=config.MODEL.PHYSNET.FRAME_NUM).to(self.device)  # [3, T, 128,128]
+
+        self.model = N3DED32(
             frames=config.MODEL.PHYSNET.FRAME_NUM).to(self.device)  # [3, T, 128,128]
 
         if config.TOOLBOX_MODE == "train_and_test":
             self.num_train_batches = len(data_loader["train"])
-            self.loss_model = Neg_Pearson()
+            self.loss_model = torch.nn.MSELoss()
+            # self.loss_model = Neg_Pearson()
+            # self.loss_model = NPSNR(Lambda=1.32, LowF=0.7, upF=3.5, width=0.4)
             self.optimizer = optim.Adam(
                 self.model.parameters(), lr=config.TRAIN.LR)
             # See more details on the OneCycleLR scheduler here: https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.OneCycleLR.html
@@ -59,13 +66,15 @@ class PhysnetTrainer(BaseTrainer):
             tbar = tqdm(data_loader["train"], ncols=80)
             for idx, batch in enumerate(tbar):
                 tbar.set_description("Train epoch %s" % epoch)
-                rPPG, x_visual, x_visual3232, x_visual1616 = self.model(
-                    batch[0].to(torch.float32).to(self.device))
+                # rPPG, x_visual, x_visual3232, x_visual1616 = self.model(
+                #     batch[0].to(torch.float32).to(self.device))
+                rPPG = self.model(batch[0].to(torch.float32).to(self.device))
                 BVP_label = batch[1].to(
                     torch.float32).to(self.device)
                 rPPG = (rPPG - torch.mean(rPPG)) / torch.std(rPPG)  # normalize
                 BVP_label = (BVP_label - torch.mean(BVP_label)) / \
                             torch.std(BVP_label)  # normalize
+                # loss = self.loss_model([rPPG, BVP_label, 30])
                 loss = self.loss_model(rPPG, BVP_label)
                 loss.backward()
                 running_loss += loss.item()
@@ -159,7 +168,8 @@ class PhysnetTrainer(BaseTrainer):
                 batch_size = test_batch[0].shape[0]
                 data, label = test_batch[0].to(
                     self.config.DEVICE), test_batch[1].to(self.config.DEVICE)
-                pred_ppg_test, _, _, _ = self.model(data)
+                # pred_ppg_test, _, _, _ = self.model(data)
+                pred_ppg_test = self.model(data)
                 for idx in range(batch_size):
                     subj_index = test_batch[2][idx]
                     sort_index = int(test_batch[3][idx])

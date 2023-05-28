@@ -130,6 +130,10 @@ if __name__ == "__main__":
         # train_loader
         if config.TRAIN.DATA.DATASET == "UBFC":
             train_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.TRAIN.DATA.DATASET == "UBFC_DaGAN":
+            train_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.TRAIN.DATA.DATASET == "UBFC_FOMM":
+            train_loader = data_loader.UBFCLoader.UBFCLoader
         elif config.TRAIN.DATA.DATASET == "PURE":
             train_loader = data_loader.PURELoader.PURELoader
         elif config.TRAIN.DATA.DATASET == "SCAMPS":
