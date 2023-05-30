@@ -134,6 +134,8 @@ if __name__ == "__main__":
             train_loader = data_loader.UBFCLoader.UBFCLoader
         elif config.TRAIN.DATA.DATASET == "UBFC_FOMM":
             train_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.TRAIN.DATA.DATASET == "UCLASYNTH":
+            train_loader = data_loader.UCLASYNTHLoader.UCLASYNTHLoader
         elif config.TRAIN.DATA.DATASET == "PURE":
             train_loader = data_loader.PURELoader.PURELoader
         elif config.TRAIN.DATA.DATASET == "SCAMPS":
@@ -167,6 +169,8 @@ if __name__ == "__main__":
         # valid_loader
         if config.VALID.DATA.DATASET == "UBFC":
             valid_loader = data_loader.UBFCLoader.UBFCLoader
+        elif config.VALID.DATA.DATASET == "UCLASYNTH":
+            valid_loader = data_loader.UCLASYNTHLoader.UCLASYNTHLoader
         elif config.VALID.DATA.DATASET == "PURE":
             valid_loader = data_loader.PURELoader.PURELoader
         elif config.VALID.DATA.DATASET == "SCAMPS":
