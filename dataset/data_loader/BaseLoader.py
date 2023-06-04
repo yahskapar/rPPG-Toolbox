@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset
 from tqdm import tqdm
+from batch_face import RetinaFace
 
 
 class BaseLoader(Dataset):
@@ -261,33 +262,45 @@ class BaseLoader(Dataset):
         return frames_clips, bvps_clips
 
     def face_detection(self, frame, use_larger_box=False, larger_box_coef=1.0):
-        """Face detection on a single frame.
+        """Face detection on a single frame using RetinaFace from Batch Face
+        https://github.com/elliottzheng/batch-face
 
         Args:
             frame(np.array): a single frame.
             use_larger_box(bool): whether to use a larger bounding box on face detection.
             larger_box_coef(float): Coef. of larger box.
         Returns:
-            face_box_coor(List[int]): coordinates of face bouding box.
+            face_box_coor(List[int]): coordinates of face bounding box.
         """
 
-        detector = cv2.CascadeClassifier(
-           './dataset/haarcascade_frontalface_default.xml')
-        face_zone = detector.detectMultiScale(frame)
-        if len(face_zone) < 1:
+        detector = RetinaFace(gpu_id=0)
+        face_zones = detector(frame)
+        
+        if len(face_zones) < 1:
             print("ERROR: No Face Detected")
             face_box_coor = [0, 0, frame.shape[0], frame.shape[1]]
-        elif len(face_zone) >= 2:
-            face_box_coor = np.argmax(face_zone, axis=0)
-            face_box_coor = face_zone[face_box_coor[2]]
-            print("Warning: More than one faces are detected(Only cropping the biggest one.)")
+        elif len(face_zones) >= 2:
+            # Find the largest face
+            face_areas = [(zone[0][2] - zone[0][0]) * (zone[0][3] - zone[0][1]) for zone in face_zones]
+            largest_face_idx = np.argmax(face_areas)
+            face_box_coor = face_zones[largest_face_idx][0]
+            print("Warning: More than one face detected (Only cropping the largest one).")
         else:
-            face_box_coor = face_zone[0]
+            face_box_coor = face_zones[0][0]
+        
         if use_larger_box:
-            face_box_coor[0] = max(0, face_box_coor[0] - (larger_box_coef - 1.0) / 2 * face_box_coor[2])
-            face_box_coor[1] = max(0, face_box_coor[1] - (larger_box_coef - 1.0) / 2 * face_box_coor[3])
-            face_box_coor[2] = larger_box_coef * face_box_coor[2]
-            face_box_coor[3] = larger_box_coef * face_box_coor[3]
+            # Calculate the dimensions of the larger bounding box
+            face_width = face_box_coor[2] - face_box_coor[0]
+            face_height = face_box_coor[3] - face_box_coor[1]
+            width_increase = int(face_width * (larger_box_coef - 1) / 2)
+            height_increase = int(face_height * (larger_box_coef - 1) / 2)
+
+            # Extend the bounding box
+            face_box_coor[0] = max(face_box_coor[0] - width_increase, 0)
+            face_box_coor[1] = max(face_box_coor[1] - height_increase, 0)
+            face_box_coor[2] = min(face_box_coor[2] + width_increase, frame.shape[1])
+            face_box_coor[3] = min(face_box_coor[3] + height_increase, frame.shape[0])
+        
         return face_box_coor
 
     def crop_face_resize(self, frames, use_face_detection, use_larger_box, larger_box_coef, use_dynamic_detection, 
@@ -318,6 +331,7 @@ class BaseLoader(Dataset):
         # Perform face detection by num_dynamic_det" times.
         for idx in range(num_dynamic_det):
             if use_face_detection:
+                # Returned face regions are in format [x1, y1, x2, y2]
                 face_region_all.append(self.face_detection(frames[detection_freq * idx], use_larger_box, larger_box_coef))
             else:
                 face_region_all.append([0, 0, frames.shape[1], frames.shape[2]])
@@ -340,8 +354,9 @@ class BaseLoader(Dataset):
                     face_region = face_region_median
                 else:
                     face_region = face_region_all[reference_index]
-                frame = frame[max(face_region[1], 0):min(face_region[1] + face_region[3], frame.shape[0]),
-                        max(face_region[0], 0):min(face_region[0] + face_region[2], frame.shape[1])]
+                # TODO: comment this better
+                frame = frame[max(face_region[1], 0):min(face_region[3], frame.shape[0]),
+                                    max(face_region[0], 0):min(face_region[2], frame.shape[1])]
             resized_frames[i] = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
         return resized_frames
 
