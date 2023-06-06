@@ -166,6 +166,9 @@ class PhysnetTrainer(BaseTrainer):
                     if subj_index not in predictions.keys():
                         predictions[subj_index] = dict()
                         labels[subj_index] = dict()
+                    print(np.shape(pred_ppg_test))
+                    print(subj_index, sort_index)
+                    print(idx)
                     predictions[subj_index][sort_index] = pred_ppg_test[idx]
                     labels[subj_index][sort_index] = label[idx]
 
