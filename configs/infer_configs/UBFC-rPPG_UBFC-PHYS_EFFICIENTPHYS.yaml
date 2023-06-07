@@ -20,7 +20,7 @@ TEST:
       TASK_LIST: ['T1', 'T2', 'T3']
     FS: 35
     DATASET: UBFC-PHYS
-    DO_PREPROCESS: True                    # if first time, should be true
+    DO_PREPROCESS: False                    # if first time, should be true
     DATA_FORMAT: NDCHW
     DATA_PATH: "/playpen-nas-hdd/UNC_Google_Physio/UBFC-PHYS/used"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/preprocessed_gold/test"    # Processed dataset save path, need to be updated
@@ -58,4 +58,5 @@ INFERENCE:
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length
     WINDOW_SIZE: 10        # In seconds
-  MODEL_PATH:   "./final_model_release/UBFC-rPPG_EfficientPhys.pth"
+  # MODEL_PATH:   "./final_model_release/PURE_EfficientPhys.pth"
+  MODEL_PATH: "/playpen-nas-ssd/akshay/UNC_Google_Physio/models/gold/MA-UBFC_UBFC_PURE_efficientphys_Epoch29.pth"
