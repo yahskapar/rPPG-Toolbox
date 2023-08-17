@@ -59,6 +59,7 @@ class PhysnetTrainer(BaseTrainer):
             tbar = tqdm(data_loader["train"], ncols=80)
             for idx, batch in enumerate(tbar):
                 tbar.set_description("Train epoch %s" % epoch)
+                # Need to check if only the first element of the batch is being passed in rather than the whole batch
                 rPPG, x_visual, x_visual3232, x_visual1616 = self.model(
                     batch[0].to(torch.float32).to(self.device))
                 BVP_label = batch[1].to(
