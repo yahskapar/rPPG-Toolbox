@@ -5,3 +5,4 @@ import neural_methods.trainer.DeepPhysTrainer
 import neural_methods.trainer.EfficientPhysTrainer
 import neural_methods.trainer.BigSmallTrainer
 import neural_methods.trainer.PhysformerTrainer
+import neural_methods.trainer.RTrPPG3DEDTrainer

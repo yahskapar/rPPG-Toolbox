@@ -75,6 +75,8 @@ def train_and_test(config, data_loader_dict):
         model_trainer = trainer.BigSmallTrainer.BigSmallTrainer(config, data_loader_dict)
     elif config.MODEL.NAME == 'Physformer':
         model_trainer = trainer.PhysformerTrainer.PhysformerTrainer(config, data_loader_dict)
+    elif config.MODEL.NAME == 'RTrPPG3DED':
+        model_trainer = trainer.RTrPPG3DEDTrainer.RTrPPG3DEDTrainer(config, data_loader_dict)
     else:
         raise ValueError('Your Model is Not Supported  Yet!')
     model_trainer.train(data_loader_dict)
@@ -95,6 +97,8 @@ def test(config, data_loader_dict):
         model_trainer = trainer.BigSmallTrainer.BigSmallTrainer(config, data_loader_dict)
     elif config.MODEL.NAME == 'Physformer':
         model_trainer = trainer.PhysformerTrainer.PhysformerTrainer(config, data_loader_dict)
+    elif config.MODEL.NAME == 'RTrPPG3DED':
+        model_trainer = trainer.RTrPPG3DEDTrainer.RTrPPG3DEDTrainer(config, data_loader_dict)
     else:
         raise ValueError('Your Model is Not Supported  Yet!')
     model_trainer.test(data_loader_dict)
