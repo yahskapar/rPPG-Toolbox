@@ -9,7 +9,7 @@ import math
 import torch
 import torch.optim as optim
 from evaluation.metrics import calculate_metrics
-from neural_methods.loss.NegPearsonLoss import Neg_Pearson
+from neural_methods.loss.PhysNetNegPearsonLoss import Neg_Pearson
 from neural_methods.model.TorchLossComputer import TorchLossComputer
 from neural_methods.model.Physformer import ViT_ST_ST_Compact3_TDC_gra_sharp
 from neural_methods.trainer.BaseTrainer import BaseTrainer
@@ -36,7 +36,7 @@ class PhysformerTrainer(BaseTrainer):
         self.best_epoch = 0
 
         if config.TOOLBOX_MODE == "train_and_test":
-            self.model = ViT_ST_ST_Compact3_TDC_gra_sharp(image_size=(128,128,128), patches=(4,4,4), dim=96, ff_dim=144, num_heads=4, num_layers=12, dropout_rate=0.1, theta=0.7).to(self.device)
+            self.model = ViT_ST_ST_Compact3_TDC_gra_sharp(image_size=(180,128,128), patches=(4,4,4), dim=96, ff_dim=144, num_heads=4, num_layers=12, dropout_rate=0.1, theta=0.7).to(self.device)
             # self.model = TSCAN(frame_depth=self.frame_depth, img_size=config.TRAIN.DATA.PREPROCESS.RESIZE.H).to(self.device)
             self.model = torch.nn.DataParallel(self.model, device_ids=list(range(config.NUM_OF_GPU_TRAIN)))
 
@@ -45,146 +45,281 @@ class PhysformerTrainer(BaseTrainer):
             self.criterion_L1loss = torch.nn.L1Loss()
             self.criterion_class = torch.nn.CrossEntropyLoss()
             self.criterion_Pearson = Neg_Pearson()
-            self.optimizer = optim.AdamW(
-                self.model.parameters(), lr=config.TRAIN.LR, weight_decay=0)
-            # self.optimizer = optim.Adam(self.model.parameters(), lr=0.0001, weight_decay=0.00005)
+            # self.optimizer = optim.AdamW(
+            #     self.model.parameters(), lr=config.TRAIN.LR, weight_decay=0)
+            self.optimizer = optim.Adam(self.model.parameters(), lr=0.0001, weight_decay=0.00005)
             # See more details on the OneCycleLR scheduler here: https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.OneCycleLR.html
-            self.scheduler = torch.optim.lr_scheduler.OneCycleLR(
-                self.optimizer, max_lr=config.TRAIN.LR, epochs=config.TRAIN.EPOCHS, steps_per_epoch=self.num_train_batches)
-            # self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=50, gamma=0.5)
+            # self.scheduler = torch.optim.lr_scheduler.OneCycleLR(
+            #     self.optimizer, max_lr=config.TRAIN.LR, epochs=config.TRAIN.EPOCHS, steps_per_epoch=self.num_train_batches)
+            self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=50, gamma=0.5)
         elif config.TOOLBOX_MODE == "only_test":
-            self.model = ViT_ST_ST_Compact3_TDC_gra_sharp(image_size=(128,128,128), patches=(4,4,4), dim=96, ff_dim=144, num_heads=4, num_layers=12, dropout_rate=0.1, theta=0.7).to(self.device)
+            self.model = ViT_ST_ST_Compact3_TDC_gra_sharp(image_size=(180,128,128), patches=(4,4,4), dim=96, ff_dim=144, num_heads=4, num_layers=12, dropout_rate=0.1, theta=0.7).to(self.device)
             # self.model = TSCAN(frame_depth=self.frame_depth, img_size=config.TEST.DATA.PREPROCESS.RESIZE.H).to(self.device)
             self.model = torch.nn.DataParallel(self.model, device_ids=list(range(config.NUM_OF_GPU_TRAIN)))
         else:
             raise ValueError("Physformer trainer initialized in incorrect toolbox mode!")
+
 
     def train(self, data_loader):
         """Training routine for model"""
         if data_loader["train"] is None:
             raise ValueError("No data for train")
         
+        # # a --> Pearson loss; b --> frequency loss
+        # a_start = 0.1
+        # b_start = 1.0
+        # exp_a = 0.5
+        # exp_b = 5.0
+
         # a --> Pearson loss; b --> frequency loss
-        a_start = 0.1
-        b_start = 1.0
-        exp_a = 0.5
-        exp_b = 5.0
+        a_start = 1
+        b_start = 1
+        exp_b = 1
 
+        best = np.inf
         for epoch in range(self.max_epoch_num):
-            print('')
-            print(f"====Training Epoch: {epoch}====")
-            running_loss = 0.0
-            train_loss = []
-
+            loss_rPPG_avg = []
+            loss_peak_avg = []
+            loss_kl_avg_test = []
+            loss_hr_mae = []
             self.model.train()
-            # Model Training
-            tbar = tqdm(data_loader["train"], ncols=80)
-            for idx, batch in enumerate(tbar):
-                tbar.set_description("Train epoch %s" % epoch)
-
-                gra_sharp = 2.0
-                data = batch[0].to(torch.float32).to(self.device)
-                rPPG, x_visual, x_visual3232, x_visual1616 = self.model(
-                                    data, gra_sharp)
-                
-                BVP_label = batch[1]
-                hr = torch.tensor([self.get_hr(i) for i in BVP_label]).float().cuda()
-                BVP_label = BVP_label.to(torch.float32).to(self.device)
-                rPPG = (rPPG - torch.mean(rPPG)) / torch.std(rPPG)  # normalize
-                BVP_label = (BVP_label - torch.mean(BVP_label)) / \
-                            torch.std(BVP_label)  # normalize
-                loss_rPPG = self.criterion_Pearson(rPPG, BVP_label)
-                # loss_rPPG = self.criterion_reg(rPPG, BVP_label)
-            
-                fre_loss = 0.0
-                kl_loss = 0.0
-                train_mae = 0.0
-
-                for bb in range(data.shape[0]):
-                    # Double check this is functioning as expected later...
-                    loss_distribution_kl, fre_loss_temp, train_mae_temp = TorchLossComputer.cross_entropy_power_spectrum_DLDL_softmax2(rPPG[bb], hr[bb], self.frame_rate, std=1.0)  # std=1.1
-                    fre_loss = fre_loss + fre_loss_temp
-                    kl_loss = kl_loss + loss_distribution_kl
-                    train_mae = train_mae + train_mae_temp
-                fre_loss = fre_loss/data.shape[0]
-                kl_loss = kl_loss/data.shape[0]
-                train_mae = train_mae/data.shape[0]
-
-                if epoch >25:
-                    a = 0.05
-                    b = 5.0
-                else:
-                    # exp descend
-                    a = a_start*math.pow(exp_a, epoch/25.0)
-                    # exp ascend
-                    b = b_start*math.pow(exp_b, epoch/25.0)
-                
-                a = 0.1
-                #b = 1.0
-                
-                loss =  a*loss_rPPG + b*(fre_loss+kl_loss)
-                # loss =  a*loss_rPPG
-                # loss = loss_rPPG
-                #loss =  0.1*loss_rPPG + fre_loss
-                loss.backward()
-
-                self.optimizer.step()
-                self.scheduler.step()
+            fps = self.frame_rate
+            print(f'epoch:{epoch} train:')
+            for i, batch in enumerate(tqdm(data_loader["train"], ncols=80)):
+                hr = torch.tensor([self.get_hr(i) for i in batch[1]]).float().cuda()
+                data, label = batch[0].float().cuda(), batch[1].float().cuda()
                 self.optimizer.zero_grad()
-                running_loss += loss.item()
-
-                if idx % 100 == 99:  # print every 100 mini-batches
-                    print(
-                        f'[{epoch}, {idx + 1:5d}] loss: {running_loss / 100:.3f}')
-                    running_loss = 0.0
-                train_loss.append(loss.item())
-                tbar.set_postfix(loss=loss.item())
-            self.save_model(epoch)
-            if not self.config.TEST.USE_LAST_EPOCH: 
-                valid_loss = self.valid(data_loader)
-                print('validation loss: ', valid_loss)
-                if self.min_valid_loss is None:
-                    self.min_valid_loss = valid_loss
-                    self.best_epoch = epoch
-                    print("Update best model! Best epoch: {}".format(self.best_epoch))
-                elif (valid_loss < self.min_valid_loss):
-                    self.min_valid_loss = valid_loss
-                    self.best_epoch = epoch
-                    print("Update best model! Best epoch: {}".format(self.best_epoch))
-        if not self.config.TEST.USE_LAST_EPOCH: 
-            print("best trained epoch: {}, min_val_loss: {}".format(self.best_epoch, self.min_valid_loss))
-
-    def valid(self, data_loader):
-        """ Runs the model on valid sets."""
-        if data_loader["valid"] is None:
-            raise ValueError("No data for valid")
-
-        print('')
-        print(" ====Validing===")
-        valid_loss = []
-        self.model.eval()
-        valid_step = 0
-        with torch.no_grad():
-            vbar = tqdm(data_loader["valid"], ncols=80)
-            for valid_idx, valid_batch in enumerate(vbar):
-                vbar.set_description("Validation")
-                BVP_label = valid_batch[1].to(
-                    torch.float32).to(self.device)
                 gra_sharp = 2.0
-                rPPG, x_visual, x_visual3232, x_visual1616 = self.model(
-                    valid_batch[0].to(torch.float32).to(self.device), gra_sharp)
-                rPPG = (rPPG - torch.mean(rPPG)) / torch.std(rPPG)  # normalize
-                BVP_label = (BVP_label - torch.mean(BVP_label)) / \
-                            torch.std(BVP_label)  # normalize
-                loss_rPPG = self.criterion_Pearson(rPPG, BVP_label)
-                # TODO: More to do with loss term here?
+                bvp, s1, s2, s3 = self.model(data, gra_sharp)
+                bvp = (bvp-torch.mean(bvp, axis=-1).view(-1, 1))/torch.std(bvp, axis=-1).view(-1, 1)
+                loss_bvp = self.criterion_Pearson(bvp, label)
+                fre_loss = .0
+                kl = .0
+                train_mae = .0
+                for bb in range(data.shape[0]):
+                    # Double check this?
+                    loss_distribution_kl, fre_loss_temp, train_mae_temp = TorchLossComputer.cross_entropy_power_spectrum_DLDL_softmax2(bvp[bb], hr[bb], fps, std=1.0)
+                    fre_loss = fre_loss+fre_loss_temp
+                    kl = kl+loss_distribution_kl
+                    train_mae = train_mae+train_mae_temp
+                fre_loss /= data.shape[0]
+                kl /= data.shape[0]
+                train_mae /= data.shape[0]
+                a = a_start
+                if epoch>10:
+                    b = 5.
+                else:
+                    b = b_start*exp_b**(epoch/10)
+                loss = a*loss_bvp + b*(fre_loss+kl)
+                loss.backward()
+                self.optimizer.step()
+                n = data.size(0)
+                loss_rPPG_avg.append(float(loss_bvp.data))
+                loss_peak_avg.append(float(fre_loss.data))
+                loss_kl_avg_test.append(float(kl.data))
+                loss_hr_mae.append(float(train_mae))
+                print('epoch:%d, batch:%d, total=%d, lr=%f, sharp=%.3f, a=%.3f, NegPearson= %.4f, b=%.3f, kl= %.4f, fre_CEloss= %.4f, hr_mae= %.4f' % (epoch, i + 1, len(data_loader["train"])//self.batch_size, 0.0001, gra_sharp, a, np.mean(loss_rPPG_avg[-2000:]), b, np.mean(loss_kl_avg_test[-2000:]), np.mean(loss_peak_avg[-2000:]), np.mean(loss_hr_mae[-2000:])), end='\r')
+            self.optimizer.zero_grad()
+            self.save_model(epoch)
+            self.model.eval()
+            with torch.no_grad():
+                hrs = []
+                for j, val_batch in enumerate(tqdm(data_loader["valid"], ncols=80)):
+                    data, label = val_batch[0].cuda().float(), val_batch[1].cuda().float()
+                    bvp, s1, s2, s3 = self.model(data, gra_sharp)
+                    bvp = (bvp-torch.mean(bvp, axis=-1).view(-1, 1))/torch.std(bvp).view(-1, 1)
+                    for _1, _2 in zip(bvp, label):
+                        hrs.append((self.get_hr(_1.cpu().detach().numpy()), self.get_hr(_2.cpu().detach().numpy())))
+                RMSE = np.mean([(i-j)**2 for i, j in hrs])**0.5
+                print(f'Test RMSE:{RMSE:.3f}, batch:{i+1}')
+                if RMSE<best:
+                    best = RMSE
+                    # torch.save(self.model.state_dict(), '../weights/Physformer_PURE.pkl')
+                    self.save_model(epoch)
+                    self.best_epoch = epoch
+                    print("Update best model! Best epoch: {}".format(self.best_epoch))
+                self.scheduler.step()
+                if (epoch + 1) % 50 == 0:
+                    lr *= 0.5
 
-                valid_loss.append(loss_rPPG.item())
-                valid_step += 1
-                vbar.set_postfix(loss=loss_rPPG.item())
-            valid_loss = np.asarray(valid_loss)
-        return np.mean(valid_loss)
+        # for epoch in range(self.max_epoch_num):
 
+        #     # Losses to print out
+        #     loss_rPPG_avg = []
+        #     loss_peak_avg = []
+        #     loss_kl_avg_test = []
+        #     loss_hr_mae = []
+
+        #     print('')
+        #     print(f"====Training Epoch: {epoch}====")
+        #     running_loss = 0.0
+        #     train_loss = []
+
+        #     self.model.train()
+        #     # Model Training
+        #     tbar = tqdm(data_loader["train"], ncols=80)
+        #     for idx, batch in enumerate(tbar):
+        #         tbar.set_description("Train epoch %s" % epoch)
+
+        #         gra_sharp = 2.0
+        #         self.optimizer.zero_grad()
+        #         data = batch[0].to(torch.float32).to(self.device)
+        #         # Normalize the data to be between 0 and 1
+        #         data = (data - torch.min(data)) / (torch.max(data) - torch.min(data))
+        #         # print(torch.max(data), torch.min(data))
+        #         # exit()
+        #         rPPG, x_visual, x_visual3232, x_visual1616 = self.model(
+        #                             data, gra_sharp)
+                
+        #         BVP_label = batch[1]
+        #         hr = torch.tensor([self.get_hr(i) for i in BVP_label]).to(torch.float32).to(self.device)
+        #         BVP_label = BVP_label.to(torch.float32).to(self.device)
+        #         rPPG = (rPPG-torch.mean(rPPG, axis=-1).view(-1, 1))/torch.std(rPPG, axis=-1).view(-1, 1)
+        #         # rPPG = (rPPG - torch.mean(rPPG)) / torch.std(rPPG)  # normalize
+        #         # BVP_label = (BVP_label - torch.mean(BVP_label)) / \
+        #         #             torch.std(BVP_label)  # normalize
+        #         loss_rPPG = self.criterion_Pearson(rPPG, BVP_label)
+        #         # loss_rPPG = self.criterion_reg(rPPG, BVP_label)
+            
+        #         fre_loss = 0.0
+        #         kl_loss = 0.0
+        #         train_mae = 0.0
+
+        #         for bb in range(data.shape[0]):
+        #             # Double check this is functioning as expected later...
+        #             loss_distribution_kl, fre_loss_temp, train_mae_temp = TorchLossComputer.cross_entropy_power_spectrum_DLDL_softmax2(rPPG[bb], hr[bb], self.frame_rate, std=1.0)  # std=1.1
+        #             fre_loss = fre_loss + fre_loss_temp
+        #             kl_loss = kl_loss + loss_distribution_kl
+        #             train_mae = train_mae + train_mae_temp
+        #         fre_loss = fre_loss/data.shape[0]
+        #         kl_loss = kl_loss/data.shape[0]
+        #         train_mae = train_mae/data.shape[0]
+
+
+        #         a = a_start
+
+        #         # if epoch >25:
+        #         #     a = 0.05
+        #         #     b = 5.0
+        #         # else:
+        #         #     # exp descend
+        #         #     a = a_start*math.pow(exp_a, epoch/25.0)
+        #         #     # exp ascend
+        #         #     b = b_start*math.pow(exp_b, epoch/25.0)
+
+        #         if epoch>10:
+        #             b = 5.
+        #         else:
+        #             b = b_start*exp_b**(epoch/10)
+                
+        #         # a = 0.1
+        #         #b = 1.0
+                
+        #         loss =  a*loss_rPPG + b*(fre_loss+kl_loss)
+        #         # loss =  a*loss_rPPG
+        #         # loss = loss_rPPG
+        #         #loss =  0.1*loss_rPPG + fre_loss
+        #         loss.backward()
+
+        #         self.optimizer.step()
+        #         # self.scheduler.step()
+        #         # self.optimizer.zero_grad()
+        #         n = data.size(0)
+        #         loss_rPPG_avg.append(float(loss_rPPG.data))
+        #         loss_peak_avg.append(float(fre_loss.data))
+        #         loss_kl_avg_test.append(float(kl_loss.data))
+        #         loss_hr_mae.append(float(train_mae))
+        #         # print('epoch:%d, batch:%d, total=%d, lr=%f, sharp=%.3f, a=%.3f, NegPearson= %.4f, b=%.3f, kl= %.4f, fre_CEloss= %.4f, hr_mae= %.4f' % (epoch, idx + 1, len(data_loader["train"])//self.batch_size, 0.0001, gra_sharp, a, np.mean(loss_rPPG_avg[-2000:]), b, np.mean(loss_kl_avg_test[-2000:]), np.mean(loss_peak_avg[-2000:]), np.mean(loss_hr_mae[-2000:])), end='\r')
+        #         # running_loss += loss.item()
+
+        #         if idx % 100 == 99:  # print every 100 mini-batches
+        #             print('epoch:%d, batch:%d, total=%d, lr=%f, sharp=%.3f, a=%.3f, NegPearson= %.4f, b=%.3f, kl= %.4f, fre_CEloss= %.4f, hr_mae= %.4f' % (epoch, idx + 1, len(data_loader["train"])//self.batch_size, 0.0001, gra_sharp, a, np.mean(loss_rPPG_avg[-2000:]), b, np.mean(loss_kl_avg_test[-2000:]), np.mean(loss_peak_avg[-2000:]), np.mean(loss_hr_mae[-2000:])), end='\r')
+        #         #     print(
+        #         #         f'[{epoch}, {idx + 1:5d}] loss: {running_loss / 100:.3f}')
+        #         #     running_loss = 0.0
+        #         train_loss.append(loss.item())
+        #         tbar.set_postfix(loss=loss.item())
+        #     self.optimizer.zero_grad()
+        #     self.save_model(epoch)
+        #     self.scheduler.step()
+        #     # if (epoch + 1) % 50 == 0:
+        #     #     lr *= 0.5
+        #     if not self.config.TEST.USE_LAST_EPOCH: 
+        #         valid_loss = self.valid(data_loader)
+        #         # print('validation loss: ', valid_loss)
+        #         print(f'Test RMSE:{valid_loss:.3f}, batch:{idx+1}')
+        #         if self.min_valid_loss is None:
+        #             self.min_valid_loss = valid_loss
+        #             self.best_epoch = epoch
+        #             print("Update best model! Best epoch: {}".format(self.best_epoch))
+        #         elif (valid_loss < self.min_valid_loss):
+        #             self.min_valid_loss = valid_loss
+        #             self.best_epoch = epoch
+        #             print("Update best model! Best epoch: {}".format(self.best_epoch))
+        # if not self.config.TEST.USE_LAST_EPOCH: 
+        #     print("best trained epoch: {}, Test RMSE: {}".format(self.best_epoch, self.min_valid_loss))
+
+
+    # def valid(self, data_loader):
+    #     """ Runs the model on valid sets."""
+    #     if data_loader["valid"] is None:
+    #         raise ValueError("No data for valid")
+
+    #     print('')
+    #     print(" ====Validing===")
+    #     valid_loss = []
+    #     self.model.eval()
+    #     valid_step = 0
+    #     with torch.no_grad():
+    #         vbar = tqdm(data_loader["valid"], ncols=80)
+    #         hrs = []
+    #         for valid_idx, valid_batch in enumerate(vbar):
+    #             vbar.set_description("Validation")
+    #             data = valid_batch[0].to(torch.float32).to(self.device)
+    #             BVP_label = valid_batch[1].to(
+    #                 torch.float32).to(self.device)
+    #             gra_sharp = 2.0
+    #             rPPG, x_visual, x_visual3232, x_visual1616 = self.model(
+    #                 data, gra_sharp)
+    #             rPPG = (rPPG-torch.mean(rPPG, axis=-1).view(-1, 1))/torch.std(rPPG).view(-1, 1)
+    #             # loss_rPPG = self.criterion_Pearson(rPPG, BVP_label)
+    #             for _1, _2 in zip(rPPG, BVP_label):
+    #                 hrs.append((self.get_hr(_1.cpu().detach().numpy()), self.get_hr(_2.cpu().detach().numpy())))
+    #         RMSE = np.mean([(i-j)**2 for i, j in hrs])**0.5
+    #     return RMSE
+
+    # def valid(self, data_loader):
+    #     """ Runs the model on valid sets."""
+    #     if data_loader["valid"] is None:
+    #         raise ValueError("No data for valid")
+
+    #     print('')
+    #     print(" ====Validing===")
+    #     valid_loss = []
+    #     self.model.eval()
+    #     valid_step = 0
+    #     with torch.no_grad():
+    #         vbar = tqdm(data_loader["valid"], ncols=80)
+    #         for valid_idx, valid_batch in enumerate(vbar):
+    #             vbar.set_description("Validation")
+    #             BVP_label = valid_batch[1].to(
+    #                 torch.float32).to(self.device)
+    #             gra_sharp = 2.0
+    #             rPPG, x_visual, x_visual3232, x_visual1616 = self.model(
+    #                 valid_batch[0].to(torch.float32).to(self.device), gra_sharp)
+    #             rPPG = (rPPG - torch.mean(rPPG)) / torch.std(rPPG)  # normalize
+    #             BVP_label = (BVP_label - torch.mean(BVP_label)) / \
+    #                         torch.std(BVP_label)  # normalize
+    #             loss_rPPG = self.criterion_Pearson(rPPG, BVP_label)
+    #             # TODO: More to do with loss term here?
+
+    #             valid_loss.append(loss_rPPG.item())
+    #             valid_step += 1
+    #             vbar.set_postfix(loss=loss_rPPG.item())
+    #         valid_loss = np.asarray(valid_loss)
+    #     return np.mean(valid_loss)
+
+    # TODO: Check this!
     def test(self, data_loader):
         """ Runs the model on test sets."""
         if data_loader["test"] is None:
@@ -224,6 +359,8 @@ class PhysformerTrainer(BaseTrainer):
                     self.config.DEVICE), test_batch[1].to(self.config.DEVICE)
                 gra_sharp = 2.0
                 pred_ppg_test, _, _, _ = self.model(data, gra_sharp)
+                # pred_ppg_test, _, _, _ = self.model(data*2-1, gra_sharp)
+                # pred_ppg_test = pred_ppg_test - pred_ppg_test.mean(axis=-1).reshape(-1, 1)
                 for idx in range(batch_size):
                     subj_index = test_batch[2][idx]
                     sort_index = int(test_batch[3][idx])
