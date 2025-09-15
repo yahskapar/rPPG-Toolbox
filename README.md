@@ -232,6 +232,72 @@ in: Proc. 23st IEEE Int. Symposium on Robot and Human Interactive Communication 
          |   |-- CMZ2/
     -----------------
 
+* [SUMS](https://github.com/thuhci/SUMS/)
+    * Ke Liu*, Jiankai Tang*(*Co-first Author), Zhang Jiang, Yuntao Wang, Xiaojing Liu, Dong Li, Yuanchun Shi, "Summit Vitals: Multi-Camera and Multi-Signal Biosensing at High Altitudes", IEEE UIC, 2024
+    -----------------
+        data/SUMS/
+        |   |-- 060200/
+        |       |-- v01
+        |           |-- BVP.csv
+        |           |-- frames_timestamp.csv
+        |           |-- HR.csv
+        |           |-- RR.csv
+        |           |-- video_ZIP_H264_face.avi
+        |           |-- video_ZIP_H264_finger.avi
+        |       |-- v02
+        |       |-- v03
+        |       |-- v04
+        |   |-- 060201/
+        |       |-- v01
+        |       |-- v02
+        |       |...
+        |...
+        |   |-- 0602mn/
+        |       |-- v01
+        |       |-- v02
+        |       |...
+    -----------------
+
+* [LADH](https://github.com/McJackTang/FusionVitals/)
+    * Xulin Ma, Jiankai Tang, Zhang Jiang, Songqin Cheng, Yuanchun Shi, Dong Li, Xin Liu, Daniel Mcduff, Xiaojing Liu, Yuntao Wang, "Non-Contact Health Monitoring During Daily Personal Care Routines", IEEE-EMBS BSN, 2025
+    -----------------
+        data/LADH/
+        |   |-- 12_05/
+        |       |-- p_12_05_caip
+        |           |-- v01
+        |               |-- BVP.csv
+        |               |-- HR.csv
+        |               |-- RR.csv
+        |               |-- SpO2.csv
+        |               |-- frames_timestamp_IR.csv
+        |               |-- frames_timestamp_RGB.csv
+        |               |-- video_RGB_H264.avi
+        |               |-- video_IR_H264.avi
+        |           |-- v02
+        |           |-- v03
+        |           |-- v04
+        |           |-- v05
+        |       |-- p_12_05_huangxj
+        |           |-- v01
+        |               |-- ...
+        |           |-- v02
+        |           |-- v03
+        |           |-- v04
+        |           |-- v05
+        |       |-- p_12_05_liutj
+        |       |-- p_12_05_lujg
+        |       |-- ...
+        |   |-- 12_06/
+        |       |-- p_12_06_caip
+        |       |-- p_12_06_huangxj
+        |       |-- p_12_06_liutj
+        |       |-- p_12_06_lujg
+        |       |...
+        |   |-- ...
+        |   
+        |  
+    -----------------
+
 ## :bar_chart: Benchmarks
 
 The table shows  Mean Absolute Error (MAE) and Mean Absolute Percent Error (MAPE) performance across all the algorithms and datasets:
